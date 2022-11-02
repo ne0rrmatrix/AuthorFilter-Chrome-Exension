@@ -1,0 +1,41 @@
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: auto;
+  }
+  h2 {
+    text-align: left;
+    border-collapse: collapse;
+    width: auto;
+    text-align: center;
+  }
+  .title {
+    text-align: center;
+    width: auto;
+    border-collapse: collapse;
+  }
+  td, th {
+    border: 1px solid #dddddd;
+    border-collapse: collapse;
+    text-align: center;
+    padding: 8px;
+    width: auto;
+  }
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+  .button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 5px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+  }
+  .button3 {background-color: #f44336;} /* Red */ 
+  .button2 {background-color: #008CBA;} /* Blue */

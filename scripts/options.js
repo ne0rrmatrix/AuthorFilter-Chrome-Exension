@@ -1,0 +1,120 @@
+var authors = [];
+
+
+document.body.onload = function() 
+{
+  authors.length = 0;
+  var port = chrome.runtime.connect({name:"content"});
+  port.onMessage.addListener(function(response,sender,sendResponse)
+  {
+    if (typeof response != 'number')
+      {
+        authors.length = 0;
+        for (const author of response) 
+        {
+          let first_name = author.first_name
+          let last_name = author.last_name
+          insertAuthor(first_name,last_name);
+        }
+        show();
+      }
+  });
+};
+
+document.getElementById("reset").onclick =function() 
+{
+  authors.length = 0;
+  chrome.runtime.sendMessage(authors);
+  location.reload()
+}
+
+function insertAuthor(first,last) 
+{
+  let name = {}
+  name.first_name = first;
+  name.last_name = last;
+  authors.push(name);
+};
+
+function show() 
+{
+    let table = document.createElement('table');
+    let tbody = document.createElement('tbody');
+    let tr = document.createElement('tr');
+    let arr = ['First Name','Last Name','Del']
+    
+    for (let i = 0; i < arr.length; i++) 
+    {
+      let th = document.createElement('th'); 
+      let text = document.createTextNode(arr[i])
+      th.appendChild(text)
+      tr.appendChild(th);
+      tbody.appendChild(tr);
+    };
+
+    let fn = document.createElement("input");
+    fn.id = "first_name";
+    let ln = document.createElement("input");
+    ln.id = "last_name";
+    let btnAdd = document.createElement('button');
+    btnAdd.innerText = "Add";
+    btnAdd.id = "Add";
+    btnAdd.className = "button";
+
+    btnAdd.addEventListener('click', () => 
+    {
+      let first = document.getElementById('first_name').value;
+      let last = document.getElementById('last_name').value;
+      insertAuthor(first,last);
+      chrome.runtime.sendMessage(authors);
+      location.reload()
+    });
+
+    arr = [fn,ln,btnAdd];
+    tr = document.createElement('tr');
+    
+    for (let i = 0; i < arr.length; i++) 
+    {
+        let td = document.createElement('td');
+        td.appendChild(arr[i]);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    };
+
+    tr = document.createElement('tr');
+    
+    if (authors.length > 0)
+    {
+        for (let i = 0; i < authors.length; i++)
+        {
+            let btnDel = document.createElement('button');
+            btnDel.innerText = "Del";
+            btnDel.id = "Del";
+            btnDel.className = "button button3";
+            
+            btnDel.addEventListener('click', () => 
+            {
+              authors.splice(i,1);
+              chrome.runtime.sendMessage(authors);
+              location.reload();
+            });
+
+            tr = document.createElement('tr');
+            let fn = document.createTextNode(authors[i].first_name);
+            let ln = document.createTextNode(authors[i].last_name);
+            arr = [fn,ln,btnDel]
+            
+            for (let k = 0; k < arr.length; k++)
+            {
+                var td = document.createElement('td');
+                td.appendChild(arr[k]);
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+            };
+        };
+    };
+
+    table.appendChild(tbody);
+    document.getElementById("blocklist").appendChild(table);
+};
+

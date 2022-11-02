@@ -1,5 +1,5 @@
 var authors = [];
-
+var onOff = true; 
 
 document.body.onload = function() 
 {
@@ -117,4 +117,3 @@ function show()
     table.appendChild(tbody);
     document.getElementById("blocklist").appendChild(table);
 };
-

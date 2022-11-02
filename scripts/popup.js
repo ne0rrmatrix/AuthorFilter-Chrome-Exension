@@ -12,11 +12,11 @@ document.body.onload = function()
     tbody.appendChild(h2);
     document.getElementById("AuthorsBlocked").appendChild(tbody);
 }
-
+/*
 document.body.addEventListener("click", function () {
     chrome.runtime.openOptionsPage(() => console.log('options page opened'))
 });
-
+*/
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
 {
     if (tabs[0].url.includes('amazon.ca') || tabs[0].url.includes('amazon.com')) {

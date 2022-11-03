@@ -1,5 +1,5 @@
 var authors = [];
-var onOff = true; 
+
 
 document.body.onload = function() 
 {

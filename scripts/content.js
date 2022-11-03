@@ -1,5 +1,6 @@
 var authors = [];
 var sponsored = false;
+var Ischecked = true;
 var savedCounter = 0;
 const elementToObserver = document.querySelector('body');
 
@@ -17,6 +18,10 @@ chrome.runtime.onMessage.addListener(
 				  "from the extension");
 	  if (request.greeting == "hello")
 		sendResponse({farewell: savedCounter.toString()});
+		else if (typeof request == 'boolean')
+	{
+		isChecked = request;
+	}
 	}
   );
 
@@ -65,9 +70,10 @@ function filter()
 				arr[i].innerHTML = '';
 				sponsoredCounter += 1;
 			}
+			
 			for (author of authors)
 			{
-				if (arr[i].textContent.includes(author.first_name) && arr[i].textContent.includes(author.last_name)) 
+				if ( Ischecked && arr[i].textContent.includes(author.first_name) && arr[i].textContent.includes(author.last_name)) 
 				{ 
 					arr[i].innerHTML ='';
 					counter +=1;
@@ -81,9 +87,10 @@ function filter()
 
 function StoreDataAndFilter(response)
 {
-	if (typeof response === "undefined") {
-        
-       }
+	if (typeof response === "undefined") 
+	{
+		
+	}
 	else if (response != 'number')
 	{
 		for (const author of response) 
@@ -93,8 +100,12 @@ function StoreDataAndFilter(response)
 		}
 		filter();
 	}	
-};
-
+	if (typeof response === 'boolean') 
+	{
+		isChecked = response
+		filter();
+	};
+}
 function checkPage() {
 	observer.observe(elementToObserver,{subtree: true, childList: true,characterData: true});
 	console.log('Observer Connected!');
@@ -106,4 +117,4 @@ function insertAuthor(first,last)
 	name.first_name = first;
 	name.last_name = last;
 	authors.push(name);
-};
+}

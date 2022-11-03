@@ -1,26 +1,19 @@
 var authors = [];
 var sponsored = false;
-var isChecked = false;
+var isChecked = true;;
 
 
 
-chrome.storage.sync.get('isChecked',function(items){
-    let empty = items.isChecked;
-    if (typeof empty === 'undefined')
-    {
-        console.log("isChecked in storage is missing!");
-    }
-    else if (!chrome.runtime.error)
-    {
-        if (typeof empty === 'boolean') 
+function SaveIsChecked()
+{
+    chrome.storage.sync.set({'isChecked': isChecked}, function() 
         {
-            isChecked = empty
-            console.log("isChecked was in storage and retrieved!");
-        }
-        else console.log("could not get isChecked data! Ischecked in storage is not boolean.");
-    }
-})
- 
+            if (chrome.runtime.error) {
+                console.log("runtime error.");
+            }
+        });
+};
+
 chrome.storage.sync.get('authors', function(items) 
 {
     let empty = items.authors;
@@ -37,12 +30,24 @@ chrome.storage.sync.get('authors', function(items)
     }
 });
 
+chrome.storage.sync.get('isChecked',function(items){
+    let empty = items.isChecked;
+    if (typeof empty === 'undefined')
+    {
+        console.log("isChecked in storage is missing!");
+    }
+    else if (!chrome.runtime.error)
+    {
+        if (typeof empty === 'boolean') 
+        {
+            isChecked = empty
+            SaveIsChecked();
+         
+        }
+        else console.log("could not get isChecked data! Ischecked in storage is not boolean.");
+    }
+})
 
-/* TODO add event listener for msg from popup.js to get isChecked state. Done!
-        Save isChecked variable in chrome storage. Done!
-        get isChecked variable from storage. Done!
-        send isChecked variable to popup.js.
-*/
 chrome.runtime.onConnect.addListener(function(port) 
 {
     port.onMessage.addListener(function(msg) 
@@ -55,12 +60,12 @@ chrome.runtime.onConnect.addListener(function(port)
       else if (typeof msg.answer == 'boolean')
         {
             isChecked = msg.answer;
-            chrome.storage.sync.set({'isChecked': msg.answer}, function() 
-            {
-                if (chrome.runtime.error) {
-                    console.log("runtime error.");
-                }
-            });
+            SaveIsChecked()
+            
+        }
+        else if (msg.DataRequest === "DataRequest")
+        {
+            port.postMessage({answer: isChecked});
         }
     });
   });
@@ -69,6 +74,7 @@ chrome.runtime.onConnect.addListener(function(port)
 chrome.runtime.onConnect.addListener(function(port)
 {
     port.postMessage(authors);
+    port.postMessage(isChecked);
 });
 
 chrome.runtime.onMessage.addListener(function(response, sender, sendResponse)
@@ -82,6 +88,12 @@ chrome.runtime.onMessage.addListener(function(response, sender, sendResponse)
     else if (typeof response === "undefined") 
     {
         
+    }
+    else if (typeof response == 'boolean' )
+    {
+        isChecked = response;
+        SaveIsChecked();
+       
     }
     else 
     {
@@ -98,15 +110,11 @@ chrome.runtime.onMessage.addListener(function(response, sender, sendResponse)
     }    
 });
 
-
 function insertAuthor(first,last) 
 {
     let name = {}
     name.first_name = first;
     name.last_name = last;
     authors.push(name);
-}
-
-
-
+};
 

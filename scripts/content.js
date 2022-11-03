@@ -1,7 +1,7 @@
 var authors = [];
 var sponsored = false;
 var savedCounter = 0;
-const elementToObserver = document.querySelector('#search');
+const elementToObserver = document.querySelector('body');
 
 
 var port = chrome.runtime.connect({name:"content"});

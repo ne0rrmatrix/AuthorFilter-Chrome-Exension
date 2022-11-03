@@ -1,7 +1,26 @@
 var authors = [];
 var sponsored = false;
+var isChecked = false;
 
 
+
+chrome.storage.sync.get('isChecked',function(items){
+    let empty = items.isChecked;
+    if (typeof empty === 'undefined')
+    {
+        console.log("isChecked in storage is missing!");
+    }
+    else if (!chrome.runtime.error)
+    {
+        if (typeof empty === 'boolean') 
+        {
+            isChecked = empty
+            console.log("isChecked was in storage and retrieved!");
+        }
+        else console.log("could not get isChecked data! Ischecked in storage is not boolean.");
+    }
+})
+ 
 chrome.storage.sync.get('authors', function(items) 
 {
     let empty = items.authors;
@@ -18,24 +37,34 @@ chrome.storage.sync.get('authors', function(items)
     }
 });
 
-chrome.tabs.onActivated.addListener(function(activeInfo) 
+
+/* TODO add event listener for msg from popup.js to get isChecked state. Done!
+        Save isChecked variable in chrome storage. Done!
+        get isChecked variable from storage. Done!
+        send isChecked variable to popup.js.
+*/
+chrome.runtime.onConnect.addListener(function(port) 
 {
-    chrome.tabs.get(activeInfo.tabId, function(tab)
+    port.onMessage.addListener(function(msg) 
     {
-        console.log(tab.url);
-        currrent_url = tab.url;
+      if (msg.isCheckedData =="Sending is Checked Data")
+      {
+        port.postMessage({question: "Send me IsChecked"});
+      }
         
+      else if (typeof msg.answer == 'boolean')
+        {
+            isChecked = msg.answer;
+            chrome.storage.sync.set({'isChecked': msg.answer}, function() 
+            {
+                if (chrome.runtime.error) {
+                    console.log("runtime error.");
+                }
+            });
+        }
     });
-  }); 
-  
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-     if (!changeInfo.url == 'undefined') 
-     {
-        console.log(changeInfo.url);
-        currrent_url = changeInfo.url;
-    
-    };
- }); 
+  });
+
 
 chrome.runtime.onConnect.addListener(function(port)
 {
@@ -77,25 +106,6 @@ function insertAuthor(first,last)
     name.last_name = last;
     authors.push(name);
 }
-/*
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
-{
-    if (tabs[0].url.includes('amazon.ca') || tabs[0].url.includes('amazon.com')) 
-    {
-        chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) 
-        {
-                if ((response.farewell > 0) && (response.farewell != 'undefined') && !chrome.runtime.lastError)
-                {
-                    savedCounter = response.farewell;
-                    console.log(response.farewell);
-                    let counter = response;
-                    chrome.action.setBadgeText({text: counter.toString()});
-                    chrome.action.setBadgeBackgroundColor({color: '#9688F1'}); 
-                }
-        });
-    }
-});
-*/
 
 
 

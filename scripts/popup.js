@@ -1,5 +1,16 @@
 var savedCounter = 0;
-var onOff = true;
+var isChecked = true;
+var SendingFromPopup = chrome.runtime.connect({name: "PopupSendingIsChecked"});
+
+SendingFromPopup.onMessage.addListener(function(msg) 
+{
+    if (msg.question === "Send me IsChecked")
+        {
+            SendingFromPopup.postMessage({answer: isChecked});
+            console.log("Popup Sent IsChecked!");
+        }
+});
+
 document.body.onload = function() 
 {
     let h2 = document.createElement('h2');
@@ -15,34 +26,21 @@ document.body.onload = function()
     document.getElementById("AuthorsBlocked").appendChild(tbody);
     
     var checked = document.getElementById('switch');
-    checked.addEventListener('click', function() {
-    var isChecked=document.getElementById("switch").checked;
-    console.log(isChecked);
+    checked.addEventListener('click', function() 
+    {
+        isChecked=document.getElementById("switch").checked;
+        SendingFromPopup.postMessage({isCheckedData: "Sending is Checked Data"});
+        console.log('popup sending data');
     })
 }
-
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
-{
-    if (tabs[0].url.includes('amazon.ca') || tabs[0].url.includes('amazon.com')) {
-        chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) 
-    {
-            if ((response.farewell > 0) && (response.farewell != 'undefined') && !chrome.runtime.lastError)
-            {
-                savedCounter = response.farewell;
-                console.log(response.farewell);
-                filter();
-                changed(savedCounter);
-            }
-    });
-    }
-    
-});
+  
 
 function filter() 
 {
     const arr = document.querySelector('div');
     arr.innerHTML ='';
 }
+
 function changed(counter)
 {
     let h2 = document.createElement('h2');

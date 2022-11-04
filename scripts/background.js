@@ -35,8 +35,12 @@ chrome.storage.sync.get('isChecked',function(items)
     else console.log("could not get isChecked data! Ischecked in storage is not boolean.");    
 });
 
-
-
+/*
+chrome.runtime.onConnect.addListener(function(port)
+{
+    port.postMessage(authors);
+});
+*/
 chrome.runtime.onMessage.addListener(function(msg){
     if (msg.question == "data")
     {

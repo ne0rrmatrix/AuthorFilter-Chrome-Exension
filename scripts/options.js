@@ -67,7 +67,7 @@ function show()
       let first = document.getElementById('first_name').value;
       let last = document.getElementById('last_name').value;
       insertAuthor(first,last);
-      chrome.runtime.sendMessage({AuthorsData:authors});
+      chrome.runtime.sendMessage({authors});
       location.reload()
     });
 
@@ -96,7 +96,7 @@ function show()
             btnDel.addEventListener('click', () => 
             {
               authors.splice(i,1);
-              chrome.runtime.sendMessage({AuthorsData:authors});
+              chrome.runtime.sendMessage({authors});
               console.log("Option seding Author Data as: OptionsAuthors")
               location.reload();
             });

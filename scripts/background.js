@@ -49,9 +49,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     {
         sendResponse({SendingCounter: counter});
     }
-    else if (typeof request.CounterData != 'undefined')
+    else if (typeof request != 'undefined' && typeof request != 'number' && typeof request != 'boolean')
     {
-        counter = request.CounterData;
+        SaveAuthorData(request);
     }
     else if (typeof request.CheckedData != 'undefined')
     {

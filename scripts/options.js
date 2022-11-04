@@ -10,36 +10,21 @@ function insertAuthor(first,last)
 document.body.onload = function() 
 {
   authors.length = 0;
-  let port = chrome.runtime.connect({name:"content"});
-  port.onMessage.addListener(function(response,sender,sendResponse)
-  {
-    if (typeof response != 'number')
+ 
+  chrome.runtime.sendMessage({question:"data"});
+    chrome.runtime.onMessage.addListener(function(msg) 
     {
-    authors.length = 0;
-    for (const author of response) 
-    {
-      let first_name = author.first_name
-		  let last_name = author.last_name
-      insertAuthor(first_name,last_name);
-    }
-    show();}
-  });
-};
+      authors.length = 0;
+      for (const author of response) 
+      {
+        let first_name = author.first_name
+        let last_name = author.last_name
+        insertAuthor(first_name,last_name);
+      }
+    
+    });
+  }
 
-document.body.onload = function() 
-{ 
-  chrome.runtime.onMessage.addListener(function(msg) 
-  {
-    authors.length = 0;
-    for (const author of response) 
-    {
-      let first_name = author.first_name
-		  let last_name = author.last_name
-      insertAuthor(first_name,last_name);
-    }
-   
-  });
-}
 
 show();
 
@@ -80,7 +65,7 @@ function show()
       let first = document.getElementById('first_name').value;
       let last = document.getElementById('last_name').value;
       insertAuthor(first,last);
-      chrome.runtime.sendMessage({AuthorsData:authors});
+      chrome.runtime.sendMessage({SendAuthors:authors});
       location.reload()
     });
 
@@ -109,7 +94,7 @@ function show()
             btnDel.addEventListener('click', () => 
             {
               authors.splice(i,1);
-              chrome.runtime.sendMessage({AuthorsData:authors});
+              chrome.runtime.sendMessage({SendAuthors:authors});
               location.reload();
             });
 

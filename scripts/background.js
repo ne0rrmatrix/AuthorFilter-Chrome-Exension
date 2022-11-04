@@ -36,42 +36,30 @@ chrome.storage.sync.get('isChecked',function(items)
     else console.log("could not get isChecked data! Ischecked in storage is not boolean.");    
 });
 
-chrome.runtime.onMessage.addListener(function(msg){
-    if (msg.question == "data")
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+    if (request.question == "authors")
     {
-        chrome.runtime.sendMessage({SendingAuthors: authors});
-        chrome.runtime.sendMessage({SendingChecked: isChecked});
-        chrome.runtime.sendMessage({SendingCounter: counter});
+        sendResponse({SendingAuthors: authors});
     }
-    else if (msg.CounterData)
+    if (request.question == "isChecked")
     {
-        counter = msg.CounterData;
+        sendResponse({SendingChecked: isChecked});
     }
-    else if (msg.CheckedData)
+    if (request.question == "counter")
     {
-        isChecked = msg.CheckedData;
-        SaveIsChecked(msg.CheckedData);
-        console.log('Background recieved isChecked. Value is: ' + msg.CheckedData);
+        sendResponse({SendingCounter: counter});
     }
-    else if (msg.AuthorsData)
+    else if (typeof request.CounterData != 'undefined')
     {
-        SaveAuthorData(msg.AuthorsData);
+        counter = request.CounterData;
     }
-    else if (msg.PopupChecked)
+    else if (typeof request.CheckedData != 'undefined')
     {
-        isChecked = msg.PopupChecked;
-        SaveIsChecked(msg.PopupChecked);
-        console.log('Background recieved isChecked From Popup menu. Value is: ' + msg.PopupChecked);
+        isChecked = request.CheckedData;
+        SaveIsChecked(request.CheckedData);
+        console.log('Background recieved isChecked. Value is: ' + request.CheckedData);
     }
-    else if (msg.OptionData)
-    {
-        chrome.runtime.sendMessage({OptionsSendingAuthors: authors});
-    }
-    else if (msg.OptionsAuthors)
-    {
-        SaveAuthorData(msg.OptionsAuthors);
-    }
-})
+});
 
 function insertAuthor(first,last) 
 {

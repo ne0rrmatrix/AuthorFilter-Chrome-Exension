@@ -3,19 +3,26 @@ var isChecked = "yes";
 
 
 
-chrome.runtime.sendMessage({question:"data"});
+chrome.runtime.sendMessage({question:"authors"});
 
-chrome.runtime.onMessage.addListener(function(msg) {
-	
-	if (msg.SendingCounter)
-	{
-        counter = 0;
-        counter = msg.SendingCounter;
-        console.log('Popup received counter value from Background. Value is: ' + msg.SendingCounter);
-	}
-    else if( msg.SendingChecked)
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
+  {
+     
+    if (request.SendingCounter)
     {
-        isChecked = msg.SendingChecked;
+          counter = 0;
+          counter = request.SendingCounter;
+          console.log('Popup received counter value from Background. Value is: ' + request.SendingCounter);
+    }
+})
+chrome.runtime.sendMessage({question:"isChecked"});
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
+  {    
+    if (request.SendingCounter)
+    {
+          counter = 0;
+          counter = request.SendingCounter;
+          console.log('Popup received counter value from Background. Value is: ' + request.SendingCounter);
     }
 })
 

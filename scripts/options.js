@@ -19,8 +19,6 @@ document.body.onload = function()
         };
         show();
   });
-  
- 
 }
 
 
@@ -31,8 +29,8 @@ function SendAuthors()
     console.log(author)
   }
   var port = chrome.runtime.connect({name: "options"});
-  port.postMessage({sending: authors});
-  location.reload()
+  port.postMessage({OptionSending: authors});
+//  location.reload()
 }
 
 

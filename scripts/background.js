@@ -46,6 +46,14 @@ chrome.runtime.onMessage.addListener(
 )
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
+        if (request.question === 'OptionSending')
+        {
+            SaveAuthorData(Sending.OptionSending);
+        }
+    }
+)
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
         if (request.question === 'authorsContents')
         {
             sendResponse({Sending: authors})
@@ -77,17 +85,23 @@ chrome.runtime.onMessage.addListener(
         }
     }
 )
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {background: "counterRequest"}, function(response) {
-      console.log(response.SendingCounter);
-      counter = response.SendingCounter;
-      if (counter > 0)
+if (currrent_url.includes('amazon'))
+{
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+    {
+        chrome.tabs.sendMessage(tabs[0].id, {background: "counterRequest"}, function(response) 
         {
-            chrome.action.setBadgeText({text: counter.toString()});
-        }
-        chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
-    });
-  });
+            console.log(response.SendingCounter);
+            counter = response.SendingCounter;
+            if (counter > 0)
+            {
+                chrome.action.setBadgeText({text: counter.toString()});
+            }
+            chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
+        });
+        });
+}
+
 
 
   chrome.tabs.onActivated.addListener(function(activeInfo) 
@@ -108,38 +122,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     
     };
  }); 
-/*
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
-    if (request.question == "authors")
-    {
-        sendResponse({SendingAuthors: authors});
-        console.log('Background sending author data!');
-    }
-    if (request.question == "isChecked")
-    {
-        sendResponse({SendingChecked: isChecked});
-    }
-    if (request.question == "counter")
-    {
-        sendResponse({SendingCounter: counter});
-    }
-    else if (typeof request.CounterData != 'undefined')
-    {
-        counter = request.CounterData;
-    }
-    else if (typeof request.CheckedData != 'undefined')
-    {
-        isChecked = request.CheckedData;
-        SaveIsChecked(request.CheckedData);
-        console.log('Background recieved isChecked. Value is: ' + request.CheckedData);
-    }
-    else if (typeof request.AuthorsData != 'undefined')
-    {
-        SaveAuthorData(request.AuthorsData);
-        console.log('Background recieved Authors.');
-    }
-});
-*/
+ 
 function insertAuthor(first,last) 
 {
     let name = {}

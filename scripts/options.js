@@ -10,32 +10,26 @@ function insertAuthor(first,last)
 document.body.onload = function() 
 {
   authors.length = 0;
- 
-  chrome.runtime.sendMessage({question:"authors"});
-
-  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
+  chrome.runtime.sendMessage({question:"authorsOptions"}, function(response) 
   {
-     
-        for (const author of request.SendingAuthors) 
+    for (const author of response.Sending) 
         {
           insertAuthor(author.first_name,author.last_name);
           console.log(author.first_name + ' ' + author.last_name);
         };
-      
-
-      isChecked = request.SendingChecked;
   });
+  
+  show();
 }
 
 
-show();
-
-document.getElementById("reset").onclick =function() 
+function SendAuthors()
 {
-  authors.length = 0;
-  chrome.runtime.sendMessage({AuthorsData:authors});
-  location.reload()
+  var port = chrome.runtime.connect({name: "options"});
+  port.postMessage({sending: authors});
+  //location.reload()
 }
+
 
 function show() 
 {
@@ -67,8 +61,8 @@ function show()
       let first = document.getElementById('first_name').value;
       let last = document.getElementById('last_name').value;
       insertAuthor(first,last);
-      chrome.runtime.sendMessage({authors});
-      location.reload()
+      SendAuthors();
+     
     });
 
     arr = [fn,ln,btnAdd];
@@ -84,7 +78,7 @@ function show()
 
     tr = document.createElement('tr');
     
-    if (authors.length > 0)
+    if (authors.length != '')
     {
         for (let i = 0; i < authors.length; i++)
         {
@@ -96,9 +90,9 @@ function show()
             btnDel.addEventListener('click', () => 
             {
               authors.splice(i,1);
-              chrome.runtime.sendMessage({authors});
-              console.log("Option seding Author Data as: OptionsAuthors")
-              location.reload();
+              SendAuthors();;
+              console.log("Option seding Author Data as: Opt")
+              //location.reload();
             });
 
             tr = document.createElement('tr');

@@ -1,8 +1,12 @@
 var counter = 0;
 var isChecked = "yes";
 
-
-
+chrome.runtime.sendMessage({question:"ischeckedOptions"}, function(response) 
+  {
+    if (typeof response.Sending != 'undefined')
+     isChecked = response.Sending; 
+  });
+/*
 chrome.runtime.sendMessage({question:"authors"});
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) 
@@ -25,7 +29,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
           console.log('Popup received counter value from Background. Value is: ' + request.SendingCounter);
     }
 })
-
+*/
+/*
+chrome.runtime.sendMessage({question:"authorsPopup"}, function(response) 
+  {
+    for (const author of response.Sending) 
+        {
+          insertAuthor(author.first_name,author.last_name);
+          console.log(author.first_name + ' ' + author.last_name);
+        };
+  });
+  */
 document.body.onload = function() 
 {
     let h2 = document.createElement('h2');

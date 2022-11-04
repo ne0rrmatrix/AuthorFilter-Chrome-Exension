@@ -36,10 +36,43 @@ chrome.storage.sync.get('isChecked',function(items)
     else console.log("could not get isChecked data! Ischecked in storage is not boolean.");    
 });
 
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.question === 'authorsOptions')
+        {
+            sendResponse({Sending: authors})
+        }
+    }
+)
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.question === 'authorsPopup')
+        {
+            sendResponse({Sending: authors})
+        }
+    }
+)
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.question === 'ischeckedOptions')
+        {
+            sendResponse({Sending: isChecked})
+        }
+    }
+)
+chrome.runtime.onConnect.addListener(function(port) {
+    console.assert(port.name === "options");
+    port.onMessage.addListener(function(msg) {
+        console.log(msg.sending);
+        SaveAuthorData(msg.sending);
+    });
+  });
+/*
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.question == "authors")
     {
         sendResponse({SendingAuthors: authors});
+        console.log('Background sending author data!');
     }
     if (request.question == "isChecked")
     {
@@ -49,9 +82,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     {
         sendResponse({SendingCounter: counter});
     }
-    else if (typeof request != 'undefined' && typeof request != 'number' && typeof request != 'boolean')
+    else if (typeof request.CounterData != 'undefined')
     {
-        SaveAuthorData(request);
+        counter = request.CounterData;
     }
     else if (typeof request.CheckedData != 'undefined')
     {
@@ -59,8 +92,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         SaveIsChecked(request.CheckedData);
         console.log('Background recieved isChecked. Value is: ' + request.CheckedData);
     }
+    else if (typeof request.AuthorsData != 'undefined')
+    {
+        SaveAuthorData(request.AuthorsData);
+        console.log('Background recieved Authors.');
+    }
 });
-
+*/
 function insertAuthor(first,last) 
 {
     let name = {}
@@ -82,6 +120,7 @@ function SaveAuthorData(response)
 {
     authors.length = 0;
     for (const author of response){
+        console.log(author);
         insertAuthor(author.first_name,author.last_name);
     }
     chrome.storage.sync.set({'authors': authors}, function() 

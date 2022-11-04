@@ -1,15 +1,10 @@
 var authors = [];
+var sponsored = false;
 var Ischecked = 'yes';
 var savedCounter = 0;
-const elementToObserver = document.querySelector('body');
 
-function insertAuthor(first,last) 
-{
-	let name = {}
-	name.first_name = first;
-	name.last_name = last;
-	authors.push(name);
-}
+const elementToObserver = document.querySelector('#search');
+
 
 chrome.runtime.sendMessage({question:"data"});
 
@@ -20,10 +15,7 @@ chrome.runtime.onMessage.addListener(function(msg) {
 			insertAuthor(author.first_name,author.last_name);
 			
 		}
-	if (msg.SendingChecked)
-	{
 		isChecked = msg.SendingChecked;
-	}
 })
 
 const observer = new MutationObserver(() => 
@@ -67,3 +59,11 @@ function checkPage() {
 	observer.observe(elementToObserver,{subtree: true, childList: true,characterData: true});
 	console.log('Observer Connected!');
 };
+
+function insertAuthor(first,last) 
+{
+	let name = {}
+	name.first_name = first;
+	name.last_name = last;
+	authors.push(name);
+}

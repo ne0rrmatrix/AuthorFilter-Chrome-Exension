@@ -81,7 +81,7 @@ chrome.runtime.onConnect.addListener(function(port) {
     console.assert(port.name === "CounterData");
     port.onMessage.addListener(function(msg) {
         console.log(msg.savedCounter);
-        if (savedCounter > 0) counter = savedCounter;
+        if (savedCounter > 0) counter = msg.savedCounter;
         if (counter > 0)
         {
             chrome.action.setBadgeText({text: counter.toString()});

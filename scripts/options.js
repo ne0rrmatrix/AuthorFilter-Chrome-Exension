@@ -15,7 +15,7 @@ document.body.onload = function()
     chrome.runtime.onMessage.addListener(function(msg) 
     {
       authors.length = 0;
-      for (const author of response.SendingAuthor) 
+      for (const author of msg.SendingAuthor) 
       {
         let first_name = author.first_name
         let last_name = author.last_name

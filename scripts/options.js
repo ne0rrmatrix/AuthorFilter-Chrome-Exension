@@ -1,4 +1,30 @@
-let authors = [];
+document.body.onload = function() 
+{
+  authors.length = 0;
+  var port = chrome.runtime.connect({name:"content"});
+  port.onMessage.addListener(function(response,sender,sendResponse)
+  {
+    if (typeof response != 'number')
+      {
+        authors.length = 0;
+        for (const author of response) 
+        {
+          let first_name = author.first_name
+          let last_name = author.last_name
+          insertAuthor(first_name,last_name);
+        }
+        show();
+      }
+  });
+};
+
+document.getElementById("reset").onclick =function() 
+{
+  authors.length = 0;
+  chrome.runtime.sendMessage(authors);
+  location.reload()
+}
+
 function insertAuthor(first,last) 
 {
   let name = {}
@@ -6,40 +32,6 @@ function insertAuthor(first,last)
   name.last_name = last;
   authors.push(name);
 };
-
-document.body.onload = function() 
-{
-  authors.length = 0;
- 
-  chrome.runtime.sendMessage({question:"OptionData"});
-
-  chrome.runtime.onMessage.addListener(function(msg) 
-  {
-      if (msg.OptionsSendingAuthors != '')
-      {
-        for (const author of msg.OptionsSendingAuthors) 
-        {
-          insertAuthor(author.first_name,author.last_name);
-          
-        };
-      };
-
-    if (msg.SendingChecked)
-    {
-      isChecked = msg.SendingChecked;
-    };
-  });
-}
-
-
-show();
-
-document.getElementById("reset").onclick =function() 
-{
-  authors.length = 0;
-  chrome.runtime.sendMessage({AuthorsData:authors});
-  location.reload()
-}
 
 function show() 
 {
@@ -71,7 +63,7 @@ function show()
       let first = document.getElementById('first_name').value;
       let last = document.getElementById('last_name').value;
       insertAuthor(first,last);
-      chrome.runtime.sendMessage({OptionsAuthors:authors});
+      chrome.runtime.sendMessage(authors);
       location.reload()
     });
 
@@ -100,7 +92,7 @@ function show()
             btnDel.addEventListener('click', () => 
             {
               authors.splice(i,1);
-              chrome.runtime.sendMessage({OptionsAuthors:authors});
+              chrome.runtime.sendMessage(authors);
               location.reload();
             });
 
@@ -122,4 +114,3 @@ function show()
     table.appendChild(tbody);
     document.getElementById("blocklist").appendChild(table);
 };
-

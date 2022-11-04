@@ -12,18 +12,24 @@ document.body.onload = function()
   authors.length = 0;
  
   chrome.runtime.sendMessage({question:"data"});
-    chrome.runtime.onMessage.addListener(function(msg) 
-    {
-      authors.length = 0;
-      for (const author of msg.SendingAuthor) 
+
+  chrome.runtime.onMessage.addListener(function(msg) 
+  {
+      if (msg.SendingAuthors != '')
       {
-        let first_name = author.first_name
-        let last_name = author.last_name
-        insertAuthor(first_name,last_name);
-      }
-    
-    });
-  }
+        for (const author of msg.SendAuthors) 
+        {
+          insertAuthor(author.first_name,author.last_name);
+          
+        };
+      };
+
+    if (msg.SendingChecked)
+    {
+      isChecked = msg.SendingChecked;
+    };
+  });
+}
 
 
 show();

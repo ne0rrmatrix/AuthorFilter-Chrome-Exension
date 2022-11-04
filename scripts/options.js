@@ -17,7 +17,7 @@ document.body.onload = function()
   {
       if (msg.SendingAuthors != '')
       {
-        for (const author of msg.SendAuthors) 
+        for (const author of msg.SendingAuthors) 
         {
           insertAuthor(author.first_name,author.last_name);
           

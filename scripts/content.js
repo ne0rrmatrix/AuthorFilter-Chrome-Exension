@@ -49,11 +49,20 @@ function filter()
 		if (counter > savedCounter) 
 		{
 			savedCounter = counter;
-			chrome.runtime.sendMessage({CounterData : savedCounter})
+			SendCounter();
 		}	
 	}
 };
-
+function SendCounter()
+{
+	chrome.runtime.onMessage.addListener(
+		function(request, sender, sendResponse) 
+		{
+		  if (request.Background === "counterRequest")
+			sendResponse({SendingCounter: counter});
+		}
+	  );
+}
 function checkPage() {
 	observer.observe(elementToObserver,{subtree: true, childList: true,characterData: true});
 	console.log('Observer Connected!');

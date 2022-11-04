@@ -36,6 +36,12 @@ chrome.storage.sync.get('isChecked',function(items)
     else console.log("could not get isChecked data! Ischecked in storage is not boolean.");    
 });
 
+chrome.runtime.onConnect.addListener(function(port) {
+    console.assert(port.name === "options");
+    port.onMessage.addListener(function(msg) {
+       SaveAuthorData(msg.OptionSending)
+    });
+  });
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         if (request.question === 'authorsOptions')

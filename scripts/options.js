@@ -28,6 +28,7 @@ function SendAuthors()
   {
     console.log(author)
   }
+  
   var port = chrome.runtime.connect({name: "options"});
   port.postMessage({OptionSending: authors});
 //  location.reload()

@@ -69,6 +69,14 @@ chrome.runtime.onMessage.addListener(
     }
 )
 
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.question === 'PopupCounter')
+        {
+            sendResponse({Sending: counter})
+        }
+    }
+)
 chrome.runtime.onConnect.addListener(function(port) {
     console.assert(port.name === "CounterData");
     port.onMessage.addListener(function(msg) {

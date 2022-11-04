@@ -108,6 +108,17 @@ if (currrent_url.includes('amazon'))
         });
 }
 
+if (!currrent_url.includes('amazon'))
+{
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+    {
+                chrome.action.setBadgeText({text: "0"});
+            chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
+        });
+}
+
+
+
 
 
   chrome.tabs.onActivated.addListener(function(activeInfo) 
@@ -160,3 +171,14 @@ function SaveAuthorData(response)
         }
     });
 }
+
+
+chrome.runtime.onMessage.addListener(function(response, sender, sendResponse)
+{
+    if (typeof response == 'number')
+    {
+        let counter = response;
+        chrome.action.setBadgeText({text: counter.toString()});
+        chrome.action.setBadgeBackgroundColor({color: '#9688F1'}); 
+    }
+});

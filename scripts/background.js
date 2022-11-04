@@ -68,11 +68,19 @@ chrome.runtime.onMessage.addListener(
         }
     }
 )
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.question === 'ischeckedOptions')
+        {
+            sendResponse({Sending: isChecked})
+        }
+    }
+)
 chrome.runtime.onConnect.addListener(function(port) {
-    console.assert(port.name === "options");
+    console.assert(port.name === "CounterData");
     port.onMessage.addListener(function(msg) {
-        console.log(msg.sending);
-        SaveAuthorData(msg.sending);
+        console.log(msg.savedCounter);
+        if (savedCounter > 0) counter = savedCounter;
     });
   });
 /*

@@ -3,6 +3,15 @@ var sponsored = false;
 var isChecked = true;
 var counter = 0;
 
+const elementToObserver = document.querySelector('#search');
+
+
+var port = chrome.runtime.connect({name:"content"});
+port.onMessage.addListener(function(response,sender,sendResponse)
+{
+	StoreDataAndFilter(response);
+});
+
 chrome.storage.sync.get('authors', function(items) 
 {
     let empty = items.authors;
@@ -35,11 +44,6 @@ chrome.storage.sync.get('isChecked',function(items)
     else console.log("could not get isChecked data! Ischecked in storage is not boolean.");    
 });
 
-chrome.runtime.onConnect.addListener(function(port)
-{
-    port.postMessage(authors);
-});
-
 chrome.runtime.onMessage.addListener(function(msg){
     if (msg.question == "data")
     {
@@ -70,10 +74,6 @@ chrome.runtime.onMessage.addListener(function(msg){
     else if (msg.OptionData)
     {
         chrome.runtime.sendMessage({OptionsSendingAuthors: authors});
-    }
-    else if (msg.OptionsAuthors)
-    {
-        SaveAuthorData(msg.OptionsAuthors);
     }
 })
 

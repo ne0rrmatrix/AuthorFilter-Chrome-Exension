@@ -14,7 +14,7 @@ chrome.runtime.sendMessage({question:"authorsContents"}, function(response)
 			insertAuthor(author.first_name,author.last_name);
 			console.log(author.first_name + ' ' + author.last_name);
 		};
-	show();
+	
 });
 
 const observer = new MutationObserver(() => 

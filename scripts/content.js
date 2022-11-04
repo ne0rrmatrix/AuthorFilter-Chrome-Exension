@@ -24,16 +24,21 @@ const observer = new MutationObserver(() =>
 });
 
 checkPage();
- if (!location.href.includes('amazon')) {observer.disconnect();console.log('Observer Disconnected!')}
-setTimeout(() => {observer.disconnect();console.log('Observer Disconnected!');checkPage();}, 5000);
+ if (!location.href.includes('amazon')) 
+ observer.observe(elementToObserver,{subtree: true, childList: true,characterData: true});
+ 
+setTimeout(() => {observer.disconnect();console.log('Observer Disconnected!');observer.observe(document.body, 
+	{
+		characterData: true,
+		childList: true,
+		subtree: true
+  	});}, 1000);
  
 
 function filter() 
 {
 	let counter = 0;
-	const arr = Array.from(document.querySelectorAll('#search'))
-	if (arr != '' && authors.length != '') 
-	{
+	const arr = Array.from(document.querySelectorAll('[data-index]'))
 		for (let i = 0; i < arr.length; i++)
 		{
 				for (author of authors)
@@ -49,20 +54,10 @@ function filter()
 		if (counter > savedCounter) 
 		{
 			savedCounter = counter;
-			SendCounter();
+			SendData(counter);
 		}	
-	}
 };
-function SendCounter()
-{
-	chrome.runtime.onMessage.addListener(
-		function(request, sender, sendResponse) 
-		{
-		  if (request.Background === "counterRequest")
-			sendResponse({SendingCounter: counter});
-		}
-	  );
-}
+
 function checkPage() {
 	observer.observe(elementToObserver,{subtree: true, childList: true,characterData: true});
 	console.log('Observer Connected!');
@@ -75,3 +70,25 @@ function insertAuthor(first,last)
 	name.last_name = last;
 	authors.push(name);
 }
+
+function SendData(counter)
+{
+	if (counter > 0)
+	{
+		savedCounter = counter;
+	}
+	
+	if (savedCounter > 0)
+	{
+		chrome.runtime.onMessage.addListener(
+			function(request, sender, sendResponse) {
+			  console.log(sender.tab ?
+						  "from a content script:" + sender.tab.url :
+						  "from the extension");
+			  if (request.greeting == "hello")
+				sendResponse({farewell: savedCounter.toString()});
+			}
+		  );
+		chrome.runtime.sendMessage(savedCounter);
+	}
+};

@@ -11,13 +11,13 @@ document.body.onload = function()
 {
   authors.length = 0;
  
-  chrome.runtime.sendMessage({question:"data"});
+  chrome.runtime.sendMessage({question:"OptionData"});
 
   chrome.runtime.onMessage.addListener(function(msg) 
   {
-      if (msg.SendingAuthors != '')
+      if (msg.OptionsSendingAuthors != '')
       {
-        for (const author of msg.SendingAuthors) 
+        for (const author of msg.OptionsSendingAuthors) 
         {
           insertAuthor(author.first_name,author.last_name);
           
@@ -71,7 +71,7 @@ function show()
       let first = document.getElementById('first_name').value;
       let last = document.getElementById('last_name').value;
       insertAuthor(first,last);
-      chrome.runtime.sendMessage({AuthorsData:authors});
+      chrome.runtime.sendMessage({OptionsAuthors:authors});
       location.reload()
     });
 
@@ -100,7 +100,7 @@ function show()
             btnDel.addEventListener('click', () => 
             {
               authors.splice(i,1);
-              chrome.runtime.sendMessage({AuthorsData:authors});
+              chrome.runtime.sendMessage({OptionsAuthors:authors});
               location.reload();
             });
 

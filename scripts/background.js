@@ -62,6 +62,10 @@ chrome.runtime.onMessage.addListener(function(msg){
         SaveIsChecked(msg.PopupChecked);
         console.log('Background recieved isChecked From Popup menu. Value is: ' + msg.PopupChecked);
     }
+    else if (msg.OptionData)
+    {
+        chrome.runtime.sendMessage({OptionsSendingAuthors: authors});
+    }
     else if (msg.OptionsAuthors)
     {
         SaveAuthorData(msg.OptionsAuthors);

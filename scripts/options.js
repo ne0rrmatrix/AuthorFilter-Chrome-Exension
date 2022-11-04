@@ -25,6 +25,10 @@ document.body.onload = function()
 
 function SendAuthors()
 {
+  for (const author of authors)
+  {
+    console.log(author)
+  }
   var port = chrome.runtime.connect({name: "options"});
   port.postMessage({sending: authors});
   //location.reload()

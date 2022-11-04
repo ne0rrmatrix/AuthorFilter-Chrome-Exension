@@ -17,9 +17,10 @@ document.body.onload = function()
           insertAuthor(author.first_name,author.last_name);
           console.log(author.first_name + ' ' + author.last_name);
         };
+        show();
   });
   
-  show();
+ 
 }
 
 
@@ -31,7 +32,7 @@ function SendAuthors()
   }
   var port = chrome.runtime.connect({name: "options"});
   port.postMessage({sending: authors});
-  //location.reload()
+  location.reload()
 }
 
 
@@ -96,7 +97,6 @@ function show()
               authors.splice(i,1);
               SendAuthors();;
               console.log("Option seding Author Data as: Opt")
-              //location.reload();
             });
 
             tr = document.createElement('tr');
@@ -118,3 +118,10 @@ function show()
     document.getElementById("blocklist").appendChild(table);
 };
 
+
+document.getElementById("reset").onclick =function() 
+{
+  authors.length = 0;
+  SendAuthors();
+  location.reload()
+}

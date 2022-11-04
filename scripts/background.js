@@ -46,6 +46,14 @@ chrome.runtime.onMessage.addListener(
 )
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
+        if (request.question === 'authorsContents')
+        {
+            sendResponse({Sending: authors})
+        }
+    }
+)
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
         if (request.question === 'authorsPopup')
         {
             sendResponse({Sending: authors})

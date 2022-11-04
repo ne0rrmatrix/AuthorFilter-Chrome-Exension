@@ -6,17 +6,16 @@ var savedCounter = 0;
 const elementToObserver = document.querySelector('#search');
 
 
-chrome.runtime.sendMessage({question:"data"});
-
-chrome.runtime.onMessage.addListener(function(msg) {
-	
-		for (const author of msg.SendAuthors) 
+chrome.runtime.sendMessage({question:"authorsContents"}, function(response) 
+{
+	authors.length = 0;
+	for (const author of response.Sending) 
 		{
 			insertAuthor(author.first_name,author.last_name);
-			
-		}
-		isChecked = msg.SendingChecked;
-})
+			console.log(author.first_name + ' ' + author.last_name);
+		};
+	show();
+});
 
 const observer = new MutationObserver(() => 
 {

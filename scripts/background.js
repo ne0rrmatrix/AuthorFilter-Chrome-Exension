@@ -1,8 +1,8 @@
 var authors = [];
 var sponsored = false;
-var isChecked = true;
+var isChecked = "yes";
 var counter = 0;
-
+var currrent_url = '';
 
 chrome.storage.sync.get('authors', function(items) 
 {
@@ -68,21 +68,39 @@ chrome.runtime.onMessage.addListener(
         }
     }
 )
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.question === 'ischeckedOptions')
-        {
-            sendResponse({Sending: isChecked})
-        }
-    }
-)
+
 chrome.runtime.onConnect.addListener(function(port) {
     console.assert(port.name === "CounterData");
     port.onMessage.addListener(function(msg) {
         console.log(msg.savedCounter);
         if (savedCounter > 0) counter = savedCounter;
+        if (counter > 0)
+        {
+            chrome.action.setBadgeText({text: counter.toString()});
+        }
+        chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
     });
   });
+
+
+  chrome.tabs.onActivated.addListener(function(activeInfo) 
+{
+    chrome.tabs.get(activeInfo.tabId, function(tab)
+    {
+        console.log(tab.url);
+        currrent_url = tab.url;
+        
+    });
+  }); 
+  
+  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+     if (!changeInfo.url == 'undefined') 
+     {
+        console.log(changeInfo.url);
+        currrent_url = changeInfo.url;
+    
+    };
+ }); 
 /*
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     if (request.question == "authors")

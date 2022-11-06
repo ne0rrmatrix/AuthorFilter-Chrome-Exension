@@ -15,30 +15,20 @@ document.body.onload = function()
 			for (const author of response.Sending) 
         {
           insertAuthor(author.first_name,author.last_name);
-          console.log(author.first_name + ' ' + author.last_name);
         };
         show();
 		});
-
-}
+};
 
 
 function SendAuthors()
 {
-  for (const author of authors)
+  chrome.runtime.sendMessage({SendingAuthors: authors}, function(response)
   {
-    console.log(author)
-  }
-  /*
-  var port = chrome.runtime.connect({name: "options"});
-  port.postMessage({SendingAuthors: authors});
-  */
- chrome.runtime.sendMessage({SendingAuthors: authors}, function(response){
-  console.log(response.answer);
- })
-  location.reload()
-}
-
+    console.log(response.answer);
+  })
+    location.reload()
+};
 
 function show() 
 {
@@ -128,4 +118,4 @@ document.getElementById("reset").onclick =function()
   authors.length = 0;
   SendAuthors();
   location.reload()
-}
+};

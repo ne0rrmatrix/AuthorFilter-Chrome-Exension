@@ -1,5 +1,5 @@
 var counter = 0;
-var isChecked = 1;
+var isChecked = 'yes';
 
 chrome.runtime.sendMessage({question:"Counter"}, function(response) 
 {
@@ -9,10 +9,9 @@ chrome.runtime.sendMessage({question:"Counter"}, function(response)
   changed(response.SendingCounter);
 });
 
- function SendStatus(status)
+ function SendStatus()
  {
-  chrome.runtime.sendMessage({Status: status}, function(response){
-    console.log(response.answer);
+   chrome.runtime.sendMessage({SendingIsChecked: isChecked}, function(response){
    })
  }     
 document.body.onload = function() 
@@ -35,16 +34,13 @@ document.body.onload = function()
 const checkbox = document.getElementById('btn')
 
 checkbox.addEventListener('click', function() {
-    if (isChecked == 1) {
-    isChecked = 0;
-    SendStatus(0)
-    console.log(0);
-    
+    if (isChecked == 'yes') {
+    isChecked = 'no';
+    SendStatus('no')
   } else 
   {
-    isChecked = 1;
-    SendStatus(1);
-    console.log(1);
+    isChecked = 'yes';
+    SendStatus('yes');
   }
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.reload(tabs[0].id);

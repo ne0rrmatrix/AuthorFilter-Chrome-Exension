@@ -1,7 +1,15 @@
 var authors = [];
 var sponsored = false;
 var savedCounter = 0;
-var ischecked = 1;
+var ischecked;
+
+getIsChecked();
+
+chrome.runtime.onMessage.addListener(
+	(request, sender, sendResponse) => {
+		ischecked = request.ischeckedSending;
+		sendResponse({answer: "Received"});
+	});
 
 chrome.runtime.sendMessage({question:"Authors"}, function(response) 
 {
@@ -15,10 +23,8 @@ chrome.runtime.sendMessage({question:"Authors"}, function(response)
 		filter();
 });
 
-getIsChecked();
 const composeObserver = new MutationObserver(() => 
 {
-	console.log('Mutation observed!');
 	filter();
 });
 
@@ -26,17 +32,15 @@ function addObserverIfDesiredNodeAvailable() {
     var composeBox = document.querySelector('#search');
 	
     if(!composeBox) {
-        //The node we need does not exist yet.
-        //Wait 500ms and try again
         window.setTimeout(addObserverIfDesiredNodeAvailable,500);
         return;
     }
     var config = {subtree: true, childList: true,characterData: true};
     composeObserver.observe(composeBox,config);
-	//checkPage();
 	console.log('Observer Connected!');
 	
-}
+};
+
 addObserverIfDesiredNodeAvailable();
 
 setTimeout(() => {composeObserver.disconnect();console.log('Observer Disconnected!');addObserverIfDesiredNodeAvailable();}, 5000);
@@ -44,9 +48,7 @@ setTimeout(() => {composeObserver.disconnect();console.log('Observer Disconnecte
 function filter() 
 {
 	let counter = 0;
-	
-	console.log(ischecked);
-	if (ischecked == 1 || typeof temp == 'undefined')
+	if (ischecked == 'yes')
 	{
 		const arr = Array.from(document.querySelectorAll('[data-index]'))
 		for (let i = 0; i < arr.length; i++)
@@ -67,7 +69,6 @@ function filter()
 			SendData(counter);
 		}	
 	}
-	
 };
 
 function insertAuthor(first,last) 
@@ -76,7 +77,7 @@ function insertAuthor(first,last)
 	name.first_name = first;
 	name.last_name = last;
 	authors.push(name);
-}
+};
 
 function SendData(counter)
 {
@@ -89,7 +90,7 @@ function SendData(counter)
 		});
 	}
 };
-//GetIsCheckedStatus()
+
 function getIsChecked()
 {
 	chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
@@ -97,4 +98,5 @@ function getIsChecked()
 		console.log('Received ischeck! ' + response.Sendingischeck);	
 		ischecked = response.Sendingischeck; 
 	});
-}
+	filter();
+};

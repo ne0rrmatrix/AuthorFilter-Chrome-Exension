@@ -16,8 +16,10 @@ document.body.onload = function()
         {
           insertAuthor(author.first_name,author.last_name);
         };
-        show();
+        if (typeof authors != 'undefined')show();
 		});
+    if (typeof authors == 'undefined')show()
+    
 };
 
 

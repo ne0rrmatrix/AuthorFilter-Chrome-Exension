@@ -76,20 +76,20 @@ function GetItemsFromStorage()
             }
             console.log("Author list retrieved!");
         }
-        });
+    });
 
-        chrome.storage.sync.get('counter',function(items)
+    chrome.storage.sync.get('counter',function(items)
+    {
+        let empty = items.counter;
+        if (typeof empty === 'undefined' && empty != '')
         {
-            let empty = items.counter;
-            if (typeof empty === 'undefined' && empty != '')
-            {
-            }
-            else if (!chrome.runtime.error)
-            {
-                counter = empty;
-                console.log("Background retrieved coutner and its value is: " + counter);
-            }
-        });  
+        }
+        else if (!chrome.runtime.error)
+        {
+            counter = empty;
+            console.log("Background retrieved coutner and its value is: " + counter);
+        }
+    });  
 };
 
 function getIsChecked()
@@ -105,7 +105,6 @@ function getIsChecked()
         {    
             console.log("Background retrieved isCheck and its value is: " + empty);
             ischecked = empty;
-            
         }
     });
     if (typeof ischecked != 'undefined') SendingIsChecked();

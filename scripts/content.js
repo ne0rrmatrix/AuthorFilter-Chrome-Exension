@@ -15,7 +15,7 @@ chrome.runtime.sendMessage({question:"Authors"}, function(response)
 		filter();
 });
 
-
+getIsChecked();
 const composeObserver = new MutationObserver(() => 
 {
 	console.log('Mutation observed!');
@@ -44,9 +44,9 @@ setTimeout(() => {composeObserver.disconnect();console.log('Observer Disconnecte
 function filter() 
 {
 	let counter = 0;
-	getIsChecked();
+	
 	console.log(ischecked);
-	if (temp == 1 || typeof temp == 'undefined')
+	if (ischecked == 1 || typeof temp == 'undefined')
 	{
 		const arr = Array.from(document.querySelectorAll('[data-index]'))
 		for (let i = 0; i < arr.length; i++)

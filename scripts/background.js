@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener(
         if (request.question === 'Authors') sendResponse({Sending: authors});
         if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors); sendResponse({answer: "Background received Author update!"})};
         if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-        if (request.Status) {SaveIsChecked(request.Status);sendResponse({answer: "Received"})};
+        if (request.Status) {SaveIsChecked(request.Status), sendResponse({answer: "Received"})};
         if (request.question === 'ischeck') {getIsChecked();sendResponse({Sendingischeck: ischecked })};
     }
     );

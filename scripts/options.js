@@ -10,15 +10,16 @@ function insertAuthor(first,last)
 document.body.onload = function() 
 {
   authors.length = 0;
-  chrome.runtime.sendMessage({question:"authorsOptions"}, function(response) 
-  {
-    for (const author of response.Sending) 
+  chrome.runtime.sendMessage({question: "Authors"}, function(response) 
+		{
+			for (const author of response.Sending) 
         {
           insertAuthor(author.first_name,author.last_name);
           console.log(author.first_name + ' ' + author.last_name);
         };
         show();
-  });
+		});
+
 }
 
 
@@ -28,9 +29,13 @@ function SendAuthors()
   {
     console.log(author)
   }
-
+  /*
   var port = chrome.runtime.connect({name: "options"});
-  port.postMessage({OptionSending: authors});
+  port.postMessage({SendingAuthors: authors});
+  */
+ chrome.runtime.sendMessage({SendingAuthors: authors}, function(response){
+  console.log(response.answer);
+ })
   location.reload()
 }
 

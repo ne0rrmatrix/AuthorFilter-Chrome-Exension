@@ -1,11 +1,68 @@
 var authors = [];
 var sponsored = false;
-var isChecked = "yes";
 var counter = 0;
 var currrent_url = '';
+var ischecked;
 
-chrome.storage.sync.get('authors', function(items) 
+getIsChecked();
+console.log(ischecked);
+GetItemsFromStorage();
+chrome.runtime.onMessage.addListener(
+     function(request, sender, sendResponse) {
+        console.log(sender.tab ?
+                    "from a content script:" + sender.tab.url :
+                    "from the extension");
+                   var temp =  getIsChecked()
+        if (request.Counter) {SaveCounter(request.Counter);SetBadge(request.Counter);sendResponse({answer: "Counters sent!"})}
+        if (request.question === 'Authors') sendResponse({Sending: authors});
+        if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors); sendResponse({answer: "Background received Author update!"})};
+        if (request.question === 'Counter') sendResponse({SendingCounter: counter});
+        if (request.Status) {SaveIsChecked(request.Status);sendResponse({answer: "Received"})};
+        if (request.question === 'ischeck') {getIsChecked();sendResponse({Sendingischeck: ischecked })};
+    }
+    );
+
+chrome.tabs.onActivated.addListener(function(activeInfo) 
 {
+    chrome.tabs.get(activeInfo.tabId, function(tab)
+    {
+        console.log(tab.url);
+        currrent_url = tab.url;
+        SetBadge(counter);
+        console.log('Setting Badge!')
+    });
+}); 
+  
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
+{
+     if (!changeInfo.url == 'undefined') 
+     {
+        console.log(changeInfo.url);
+        currrent_url = changeInfo.url;
+        SetBadge(counter);
+        console.log('Setting Badge!')
+    };
+ }); 
+
+
+function SetBadge(response)
+{
+    if (!currrent_url.includes('amazon'))
+    {
+        chrome.action.setBadgeText({text: "0"});
+        chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
+    }
+    else
+    {
+        chrome.action.setBadgeText({text: response.toString()});
+        chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
+    }    
+} 
+
+function GetItemsFromStorage()
+{
+    chrome.storage.sync.get('authors', function(items) 
+    {
     let empty = items.authors;
     if (typeof empty ==="undefined")
     {
@@ -18,128 +75,46 @@ chrome.storage.sync.get('authors', function(items)
         {
             insertAuthor(author.first_name,author.last_name);
         }
+        console.log("Author list retrieved!");
     }
-});
-
-chrome.storage.sync.get('isChecked',function(items)
-{
-    let empty = items.isChecked;
-    if (typeof empty === 'undefined' && empty != '')
-    {
-        console.log("isChecked in storage is missing!");
-    }
-    else if (!chrome.runtime.error)
-    {
-            isChecked = empty;
-            console.log("Background retrieved isCheck and its value is: " +isChecked);
-    }
-    else console.log("could not get isChecked data! Ischecked in storage is not boolean.");    
-});
-
-chrome.runtime.onConnect.addListener(function(port) {
-    console.assert(port.name === "options");
-    port.onMessage.addListener(function(msg) {
-       SaveAuthorData(msg.OptionSending)
     });
-  });
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.question === 'authorsOptions')
-        {
-            sendResponse({Sending: authors})
-        }
-    }
-)
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.question === 'OptionSending')
-        {
-            SaveAuthorData(Sending.OptionSending);
-        }
-    }
-)
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.question === 'authorsContents')
-        {
-            sendResponse({Sending: authors})
-        }
-    }
-)
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.question === 'authorsPopup')
-        {
-            sendResponse({Sending: authors})
-        }
-    }
-)
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.question === 'ischeckedOptions')
-        {
-            sendResponse({Sending: isChecked})
-        }
-    }
-)
-
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if (request.question === 'PopupCounter')
-        {
-            sendResponse({Sending: counter})
-        }
-    }
-)
-if (currrent_url.includes('amazon'))
-{
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+    chrome.storage.sync.get('counter',function(items)
     {
-        chrome.tabs.sendMessage(tabs[0].id, {background: "counterRequest"}, function(response) 
+        let empty = items.counter;
+        if (typeof empty === 'undefined' && empty != '')
         {
-            console.log(response.SendingCounter);
-            counter = response.SendingCounter;
-            if (counter > 0)
-            {
-                chrome.action.setBadgeText({text: counter.toString()});
-            }
-            chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
-        });
-        });
+            console.log("counter in storage is missing!");
+        }
+        else if (!chrome.runtime.error)
+        {
+            counter = empty;
+            console.log("Background retrieved coutner and its value is: " + counter);
+        }
+    });
+    
 }
 
-if (!currrent_url.includes('amazon'))
+function getIsChecked()
 {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+    var temp;
+    chrome.storage.sync.get('ischecked',function(items)
     {
-                chrome.action.setBadgeText({text: "0"});
-            chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
-        });
-}
-
-
-
-
-
-  chrome.tabs.onActivated.addListener(function(activeInfo) 
-{
-    chrome.tabs.get(activeInfo.tabId, function(tab)
-    {
-        console.log(tab.url);
-        currrent_url = tab.url;
+        let empty = items.ischecked;
+        if (typeof empty === 'undefined' && empty != '')
+        {
+            console.log("isChecked in storage is missing!");
+        }
+        else if (!chrome.runtime.error)
+        {    
+            console.log("Background retrieved isCheck and its value is: " + empty);
+            ischecked = empty;
+            
+        }
         
     });
-  }); 
-  
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-     if (!changeInfo.url == 'undefined') 
-     {
-        console.log(changeInfo.url);
-        currrent_url = changeInfo.url;
-    
-    };
- }); 
- 
+   
+}
+
 function insertAuthor(first,last) 
 {
     let name = {}
@@ -150,11 +125,15 @@ function insertAuthor(first,last)
 
 function SaveIsChecked(response)
 {
-        chrome.storage.sync.set({'isChecked': response}, function(){
-            if (chrome.runtime.error) {
-                console.log("runtime error.");
-            }
-        })
+    chrome.storage.sync.set({'ischecked': response}, function(){
+        if (chrome.runtime.error) {
+            console.log("runtime error.");
+        }
+        if (!chrome.runtime.error)
+        {
+            console.log('Saved ischecked to storage! ' + response);
+        }
+    })
 }
 
 function SaveAuthorData(response)
@@ -169,16 +148,29 @@ function SaveAuthorData(response)
         if (chrome.runtime.error) {
             console.log("runtime error.");
         }
+        if (!chrome.runtime.error)
+        {
+            console.log('Saved Authors to storage!');
+        }
     });
 }
 
-
-chrome.runtime.onMessage.addListener(function(response, sender, sendResponse)
+function SaveCounter(response)
 {
-    if (typeof response == 'number')
+    console.log('Counter current value is: ' + response);
+    chrome.storage.sync.set({'counter': response}, function()
     {
-        let counter = response;
-        chrome.action.setBadgeText({text: counter.toString()});
-        chrome.action.setBadgeBackgroundColor({color: '#9688F1'}); 
-    }
-});
+        if (chrome.runtime.error)
+        {
+            console.log('runtime error.');
+        }
+        if (!chrome.runtime.error)
+        {
+            console.log('Saved counter to storage!');
+        }
+    })
+}
+
+
+//setTimeout(() => {SetBadge();console.log('Setting Badge!')}, 5000);
+  

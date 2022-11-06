@@ -1,21 +1,21 @@
 var counter = 0;
-var isChecked = "yes";
+var isChecked = 1;
 
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) 
+chrome.runtime.sendMessage({question:"Counter"}, function(response) 
 {
-  chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) 
-    {
-        if ((response.farewell > 0) && (response.farewell != 'undefined') && !chrome.runtime.lastError)
-        {
-            savedCounter = response.farewell;
-            console.log(response.farewell);
-            filter();
-            changed(savedCounter);
-        }
-    })
-})
-    
-      
+  savedCounter = response.SendingCounter;
+  console.log(response.SendingCounter);
+  filter();
+  changed(response.SendingCounter);
+});
+
+ function SendStatus(status)
+ {
+  chrome.runtime.sendMessage({Status: status}, function(response) 
+  {
+    if (response.answer === "Received") console.log("Succesfully sent status!");
+  });
+ }     
 document.body.onload = function() 
 {
   
@@ -36,16 +36,16 @@ document.body.onload = function()
 const checkbox = document.getElementById('btn')
 
 checkbox.addEventListener('click', function() {
-    if (isChecked == 'yes') {
-    isChecked = "no";
-    chrome.runtime.sendMessage({PopupChecked:'no'});
-    console.log('no');
+    if (isChecked == 1) {
+    isChecked = 0;
+    SendStatus(0)
+    console.log(isChecked);
     
   } else 
   {
-    isChecked = 'yes';
-    chrome.runtime.sendMessage({PopupChecked:'yes'});
-    console.log('yes');
+    isChecked = 1;
+    SendStatus(1);
+    console.log(1);
   }
  
 })

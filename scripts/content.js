@@ -1,44 +1,54 @@
 var authors = [];
 var sponsored = false;
-var Ischecked = 'yes';
 var savedCounter = 0;
+var ischecked = 1;
 
-const elementToObserver = document.querySelector('#search');
-
-
-chrome.runtime.sendMessage({question:"authorsContents"}, function(response) 
+chrome.runtime.sendMessage({question:"Authors"}, function(response) 
 {
 	authors.length = 0;
+	console.log('Received author list!');
 	for (const author of response.Sending) 
 		{
 			insertAuthor(author.first_name,author.last_name);
 			console.log(author.first_name + ' ' + author.last_name);
 		};
-	
+		filter();
 });
 
-const observer = new MutationObserver(() => 
+
+const composeObserver = new MutationObserver(() => 
 {
 	console.log('Mutation observed!');
 	filter();
 });
 
-checkPage();
- if (!location.href.includes('amazon')) 
- observer.observe(elementToObserver,{subtree: true, childList: true,characterData: true});
- 
-setTimeout(() => {observer.disconnect();console.log('Observer Disconnected!');observer.observe(document.body, 
-	{
-		characterData: true,
-		childList: true,
-		subtree: true
-  	});}, 1000);
- 
+function addObserverIfDesiredNodeAvailable() {
+    var composeBox = document.querySelector('#search');
+	
+    if(!composeBox) {
+        //The node we need does not exist yet.
+        //Wait 500ms and try again
+        window.setTimeout(addObserverIfDesiredNodeAvailable,500);
+        return;
+    }
+    var config = {subtree: true, childList: true,characterData: true};
+    composeObserver.observe(composeBox,config);
+	//checkPage();
+	console.log('Observer Connected!');
+	
+}
+addObserverIfDesiredNodeAvailable();
+
+setTimeout(() => {composeObserver.disconnect();console.log('Observer Disconnected!');addObserverIfDesiredNodeAvailable();}, 5000);
 
 function filter() 
 {
 	let counter = 0;
-	const arr = Array.from(document.querySelectorAll('[data-index]'))
+	getIsChecked();
+	console.log(ischecked);
+	if (temp == 1 || typeof temp == 'undefined')
+	{
+		const arr = Array.from(document.querySelectorAll('[data-index]'))
 		for (let i = 0; i < arr.length; i++)
 		{
 				for (author of authors)
@@ -56,11 +66,8 @@ function filter()
 			savedCounter = counter;
 			SendData(counter);
 		}	
-};
-
-function checkPage() {
-	observer.observe(elementToObserver,{subtree: true, childList: true,characterData: true});
-	console.log('Observer Connected!');
+	}
+	
 };
 
 function insertAuthor(first,last) 
@@ -76,19 +83,18 @@ function SendData(counter)
 	if (counter > 0)
 	{
 		savedCounter = counter;
-	}
-	
-	if (savedCounter > 0)
-	{
-		chrome.runtime.onMessage.addListener(
-			function(request, sender, sendResponse) {
-			  console.log(sender.tab ?
-						  "from a content script:" + sender.tab.url :
-						  "from the extension");
-			  if (request.greeting == "hello")
-				sendResponse({farewell: savedCounter.toString()});
-			}
-		  );
-		chrome.runtime.sendMessage(savedCounter);
+		chrome.runtime.sendMessage({Counter: counter}, function(response) 
+		{
+			console.log(response.answer);	
+		});
 	}
 };
+//GetIsCheckedStatus()
+function getIsChecked()
+{
+	chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
+	{
+		console.log('Received ischeck! ' + response.Sendingischeck);	
+		ischecked = response.Sendingischeck; 
+	});
+}

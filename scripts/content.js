@@ -93,10 +93,14 @@ function SendData(counter)
 
 function getIsChecked()
 {
-	chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
+	if (typeof ischecked != 'undefined' || ischecked != '')
+	{
+		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
 	{
 		console.log('Received ischeck! ' + response.Sendingischeck);	
 		ischecked = response.Sendingischeck; 
 	});
 	filter();
+	}
+	
 };

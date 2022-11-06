@@ -108,7 +108,7 @@ function getIsChecked()
             
         }
     });
-    SendingIsChecked();
+    if (typeof ischecked != 'undefined') SendingIsChecked();
 };
 
 
@@ -139,7 +139,6 @@ function SendingIsChecked()
 {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {ischeckedSending: ischecked}, function(response) {
-          console.log(response.answer);
         });
       });
 ;}

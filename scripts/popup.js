@@ -9,10 +9,9 @@ chrome.runtime.sendMessage({question:"Counter"}, function(response)
   changed(response.SendingCounter);
 });
 
- function SendStatus()
+ function SendStatus(status)
  {
-   chrome.runtime.sendMessage({SendingIsChecked: isChecked}, function(response){
-   })
+   chrome.runtime.sendMessage({SendingIsChecked: status});
  }     
 document.body.onload = function() 
 {
@@ -42,9 +41,11 @@ checkbox.addEventListener('click', function() {
     isChecked = 'yes';
     SendStatus('yes');
   }
+  /*
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.reload(tabs[0].id);
   });
+  */
 })
 
 function filter() 

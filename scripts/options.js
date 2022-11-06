@@ -18,8 +18,7 @@ document.body.onload = function()
         };
         if (typeof authors != 'undefined')show();
 		});
-    if (typeof authors == 'undefined')show()
-    
+    if (typeof authors == 'undefined')show();
 };
 
 
@@ -29,7 +28,7 @@ function SendAuthors()
   {
     console.log(response.answer);
   })
-    location.reload()
+    location.reload();
 };
 
 function show() 
@@ -119,5 +118,5 @@ document.getElementById("reset").onclick =function()
 {
   authors.length = 0;
   SendAuthors();
-  location.reload()
+  location.reload();
 };

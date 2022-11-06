@@ -8,6 +8,7 @@ getIsChecked();
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
 		ischecked = request.ischeckedSending;
+		console.log("received ischeck. Value is: " + ischecked);
 		sendResponse({answer: "Received"});
 	});
 
@@ -25,6 +26,7 @@ chrome.runtime.sendMessage({question:"Authors"}, function(response)
 
 const composeObserver = new MutationObserver(() => 
 {
+	getIsChecked();
 	filter();
 });
 

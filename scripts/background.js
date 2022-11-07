@@ -39,7 +39,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
 {
     chrome.tabs.get(activeInfo.tabId, function(tab)
     {
-       if (tab.url.includes('amazon'))
+       if (!tab.url == 'undefined')
         console.log(tab.url);
         currrent_url = tab.url;
         SetBadge(counter);
@@ -49,7 +49,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
 {
-        if (changeInfo.url.includes('amazon')) 
+    if (!changeInfo.url == 'undefined') 
         {
         console.log(changeInfo.url);
         currrent_url = changeInfo.url;
@@ -106,6 +106,7 @@ async function getIsChecked() {
    }
    catch 
    {
+        ischecked = 'yes';
         console.log("error getting data!")
    }
    

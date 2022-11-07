@@ -30,7 +30,7 @@ async function setStatus(request)
   var counter = 0;
   if (request.Sendingischeck) {
     if (request.Sendingischeck == 'no')span.checked = false;
-    else if (request.Sendingischeck == 'yes' ) span.checked = true;
+    else if (request.Sendingischeck == 'yes' || typeof request.SendingIsChecked == 'undefined') span.checked = true;
     console.log(request.Sendingischeck);
   }
   else if (request.SendingCounter) {counter = request.SendingCounter; console.log(request.SendingCounter)};
@@ -110,7 +110,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
 {
-  if (!changeInfo.url == 'undefined') 
+  if (typeof changeInfo.url != 'undefined') 
   {
     console.log(changeInfo.url);
     currrent_url = changeInfo.url;

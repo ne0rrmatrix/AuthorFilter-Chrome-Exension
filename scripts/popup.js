@@ -1,62 +1,79 @@
-var counter = 0;
-var isChecked = 'yes';
+var currrent_url = '';
+var span = document.getElementById('btn');
 
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
-		ischecked = request.ischeckedSending;
-		console.log("received ischeck. Value is: " + ischecked);
-		if (request.sendingCounters) counter = request.sendingCounters;
+		setStatus(request); 
+    if (request.isCheck) sendResponse({Sendingischeck: span.checked})
 	});
 
-
-getIsChecked();
-getCounters();
 document.body.onload = function() 
 {
-  LoadData();
+ getData();
 }
 
-const checkbox = document.getElementById('btn')
-
-checkbox.addEventListener('click', function() {
-    if (isChecked == 'yes') {
-    isChecked = 'no';
-    SendStatus('no')
-  } else 
+span.addEventListener('click', function() 
   {
-    isChecked = 'yes';
-    SendStatus('yes');
-  }
-})
+    if (span.checked == true) 
+    {
+    SendStatus('no')
+    } else 
+    {
+      SendStatus('yes');
+    }
+  })
 
-function getCounters()
+
+async function setStatus(request)
 {
+  var counter = 0;
+  if (request.Sendingischeck) {
+    if (request.isChecked == 'no')span.checked = false;
+    else if (request.isChecked == 'yes' ) span.checked = true;
+    console.log(request.Sendingischeck);
+  }
+  else if (request.SendingCounter) {counter = request.SendingCounter; console.log(request.SendingCounter)};
+  if (typeof request.SendingCounter != 'undefined') LoadData(counter);
+  return true;
+}
+
+
+async function getData()
+{
+  var counter = 0;
   chrome.runtime.sendMessage({question: 'Counter'}, function(response) 
   {
-    counter = response.SendingCounter;
+    setStatus(response);
     console.log(response.SendingCounter);
-    filter();
-    LoadData(response.SendingCounter);
   });
+
+  chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
+	{
+		console.log('Received ischeck! ' + response.Sendingischeck);	
+		setStatus(response);
+    console.log(response.SendingIsChecked);
+	});
+  return true
 }
-function filter() 
+
+
+async function filter() 
 {
     const arr = document.querySelector('div');
     arr.innerHTML ='';
+    return true;
 }
 
 
-function LoadData(counter)
+async function LoadData(response)
 {
-  var span = document.getElementById('btn');
-  if (isChecked == 'yes')span.checked = true;
-  if (isChecked == 'no')span.checked = false;
   
+  filter();
  
   let h2 = document.createElement('h2');
   let tbody = document.createElement('tbody');
   let text = document.createTextNode('Authors Blocked');
-  let numbers_text = document.createTextNode(counter);
+  let numbers_text = document.createTextNode(response);
 
   h2.appendChild(text);
   tbody.appendChild(h2);
@@ -65,26 +82,43 @@ function LoadData(counter)
   tbody.appendChild(h2);
   
   document.getElementById("AuthorsBlocked").appendChild(tbody);
+  return true;
 } 
-
-function getIsChecked()
-{
-		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
-	{
-		console.log('Received ischeck! ' + response.Sendingischeck);	
-		ischecked = response.Sendingischeck; 
-	});
-  console.log('Recieved ischecked status: ' + isChecked)
-};
-
 
 
  function SendStatus(status)
  {
    chrome.runtime.sendMessage({SendingIsChecked: status});
  }     
+ 
 
+chrome.tabs.onActivated.addListener(function(activeInfo) 
+{
+    chrome.tabs.get(activeInfo.tabId, function(tab)
+    {
+        console.log(tab.url);
+        currrent_url = tab.url;
+        if (!currrent_url.includes('amazon')) 
+        {
+          LoadData(0);
+        };
+    });
+}); 
+  
 
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
+{
+  if (!changeInfo.url == 'undefined') 
+  {
+    console.log(changeInfo.url);
+    currrent_url = changeInfo.url;
+    if (!currrent_url.includes('amazon')) 
+    {
+      LoadData(0);
+    };
+    
+  };
+}); 
 
 /*
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {

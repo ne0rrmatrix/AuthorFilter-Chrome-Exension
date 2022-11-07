@@ -2,7 +2,7 @@ var authors = [];
 var sponsored = false;
 var counter = 0;
 var currrent_url = '';
-var ischecked;
+var ischecked = '';
 
 const readLocalStorage = async (key) => {
     return new Promise((resolve, reject) => {
@@ -16,8 +16,7 @@ const readLocalStorage = async (key) => {
     });
     };
 
-//getIsChecked();
-//GetItemsFromStorage();
+
 getAuthors();
 getCounters();
 getIsChecked();
@@ -26,54 +25,15 @@ getIsChecked();
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
-    console.log(sender.tab ?
-                "from a content script:" + sender.tab.url :
-                "from the extension");
-    if (request.Counter) {SaveCounter(request.Counter);SetBadge(request.Counter);sendResponse({answer: "Counters sent!"})}
-    if (request.question === 'Authors') sendResponse({Sending: authors});
-    if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors); sendResponse({answer: "Background received Author update!"})};
-    if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-    if (request.SendingIsChecked) {SaveIsChecked(request.SendingIsChecked)};
-    if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
-    
+        console.log(sender.tab ?
+                    "from a content script:" + sender.tab.url :
+                    "from the extension");
+        updatedStatus(request).then
+        if (request.question === 'ischeck') sendResponse({Sendingischeck: ischecked });
+        if (request.question === 'Authors') sendResponse({Sending: authors});
+        if (request.question === 'Counter') sendResponse({SendingCounter: counter})
     });
 
-async function getAuthors() {
-    try {
-        let key1 = await readLocalStorage('authors');
-        authors.length = 0;
-                for (const author of key1) 
-                {
-                    insertAuthor(author.first_name,author.last_name);
-                }
-                console.log("Author list retrieved!");
-        }
-    catch {
-                console.log("error getting data!")
-    }
-}
-
-async function getCounters() {
-    try {
-        let key2 = await readLocalStorage('counter');
-        counter = key2;
-    }
-    catch {
-                console.log("error getting data!")
-    }
-} 
-
-async function getIsChecked() {
-   try {
-    let key3 = await readLocalStorage('ischecked');
-    ischecked = key3;
-    SendingIsChecked(key3);
-   }
-   catch {
-            console.log("error getting data!")
-   }
-   
-}
 
 chrome.tabs.onActivated.addListener(function(activeInfo) 
 {
@@ -84,16 +44,71 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
         SetBadge(counter);
     });
 }); 
-  
+    
+
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
 {
-     if (!changeInfo.url == 'undefined') 
-     {
+        if (!changeInfo.url == 'undefined') 
+        {
         console.log(changeInfo.url);
         currrent_url = changeInfo.url;
         SetBadge(counter);
     };
- }); 
+    }); 
+
+
+async function updatedStatus(request)
+{
+    if (request.SendingCounter) {SaveCounter(request.SendingCounter);SetBadge(request.SendingCounter)};
+    if (request.SendingAuthors) SaveAuthorData(request.SendingAuthors);
+    if (request.SendingIsChecked) SaveIsChecked(request.SendingIsChecked);
+    return request;
+};
+
+
+async function getAuthors() {
+    try {
+            let key1 = await readLocalStorage('authors');
+            authors.length = 0;
+            for (const author of key1) 
+            {
+                insertAuthor(author.first_name,author.last_name);
+            }
+            console.log("Author list retrieved!");
+        }
+    catch 
+    {
+        console.log("error getting data!")
+    }
+};
+
+
+async function getCounters() {
+    try 
+    {
+        let key2 = await readLocalStorage('counter');
+        counter = key2;
+    }
+    catch 
+    {
+        console.log("error getting data!")
+    }
+} 
+
+
+async function getIsChecked() {
+   try 
+   {
+        let key3 = await readLocalStorage('ischecked');
+        ischecked = key3;
+        SendingIsChecked(key3);
+   }
+   catch 
+   {
+        console.log("error getting data!")
+   }
+   
+}
 
 
 function SetBadge(response)
@@ -110,6 +125,7 @@ function SetBadge(response)
     }    
 }; 
 
+
 function insertAuthor(first,last) 
 {
     let name = {}
@@ -118,12 +134,14 @@ function insertAuthor(first,last)
     authors.push(name);
 };
 
+
 function SaveIsChecked(response)
 {
     ischecked = response;
     SendingIsChecked();
     chrome.storage.sync.set({'ischecked': response}, function(){
-        if (chrome.runtime.error) {
+        if (chrome.runtime.error) 
+        {
             console.log("runtime error.");
         }
         if (!chrome.runtime.error)
@@ -132,9 +150,8 @@ function SaveIsChecked(response)
             
         }
     })
-    
-    //setTimeout(() => {SendingIsChecked()}, 1000);
 };
+
 
 function SendingIsChecked()
 {
@@ -146,13 +163,13 @@ function SendingIsChecked()
         }        
 }
 
+
 function SendingCounters()
 {
-    if (currrent_url.includes('amazon'))
-    {
-        chrome.runtime.sendMessage({sendingCounters: counter})
-    }
+        chrome.runtime.sendMessage({SendingCounter: counter})
 }
+
+
 function SendReload()
 {
     if (currrent_url.includes('amazon'))
@@ -183,6 +200,7 @@ function SaveAuthorData(response)
     });
 };
 
+
 function SaveCounter(response)
 {
     console.log('Counter current value is: ' + response);
@@ -202,58 +220,3 @@ function SaveCounter(response)
 
 //setTimeout(() => {SetBadge();console.log('Setting Badge!')}, 5000);
   
-
-/*
-function GetItemsFromStorage()
-{
-    chrome.storage.sync.get('authors', function(items) 
-    {
-        let empty = items.authors;
-        if (typeof empty ==="undefined")
-        {
-            console.log("Author list in storage is empty!");
-        }
-
-        else if (!chrome.runtime.error) 
-        {
-            authors.length = 0;
-            for (const author of items.authors) 
-            {
-                insertAuthor(author.first_name,author.last_name);
-            }
-            console.log("Author list retrieved!");
-        }
-    });
-
-    chrome.storage.sync.get('counter',function(items)
-    {
-        let empty = items.counter;
-        if (typeof empty === 'undefined' && empty != '')
-        {
-        }
-        else if (!chrome.runtime.error)
-        {
-            counter = empty;
-            console.log("Background retrieved coutner and its value is: " + counter);
-        }
-    });  
-};
-
-function getIsChecked()
-{
-    chrome.storage.sync.get('ischecked',function(items)
-    {
-        let empty = items.ischecked;
-        if (typeof empty === 'undefined' && empty != '')
-        {
-            console.log("isChecked in storage is missing!");
-        }
-        else if (!chrome.runtime.error)
-        {    
-            console.log("Background retrieved isCheck and its value is: " + empty);
-            ischecked = empty;
-        }
-    });
-   // if (typeof ischecked != 'undefined') SendingIsChecked();
-};
-*/

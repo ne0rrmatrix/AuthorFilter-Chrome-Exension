@@ -24,10 +24,7 @@ document.body.onload = function()
 
 function SendAuthors()
 {
-  chrome.runtime.sendMessage({SendingAuthors: authors}, function(response)
-  {
-    console.log(response.answer);
-  })
+  chrome.runtime.sendMessage({SendingAuthors: authors})
     location.reload();
 };
 

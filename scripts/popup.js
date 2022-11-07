@@ -15,7 +15,7 @@ document.body.onload = function()
 
 span.addEventListener('click', function() 
   {
-    if (span.checked == true) 
+    if (span.checked == false) 
     {
     SendStatus('no')
     } else 
@@ -29,8 +29,8 @@ async function setStatus(request)
 {
   var counter = 0;
   if (request.Sendingischeck) {
-    if (request.isChecked == 'no')span.checked = false;
-    else if (request.isChecked == 'yes' ) span.checked = true;
+    if (request.Sendingischeck == 'no')span.checked = false;
+    else if (request.Sendingischeck == 'yes' ) span.checked = true;
     console.log(request.Sendingischeck);
   }
   else if (request.SendingCounter) {counter = request.SendingCounter; console.log(request.SendingCounter)};
@@ -102,7 +102,8 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
         if (!currrent_url.includes('amazon')) 
         {
           LoadData(0);
-        };
+        }
+        else getData();
     });
 }); 
   
@@ -116,8 +117,8 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
     if (!currrent_url.includes('amazon')) 
     {
       LoadData(0);
-    };
-    
+    }
+    else getData();    
   };
 }); 
 

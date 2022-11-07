@@ -39,6 +39,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
 {
     chrome.tabs.get(activeInfo.tabId, function(tab)
     {
+       if (tab.url.includes('amazon'))
         console.log(tab.url);
         currrent_url = tab.url;
         SetBadge(counter);
@@ -48,7 +49,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
 {
-        if (!changeInfo.url == 'undefined') 
+        if (changeInfo.url.includes('amazon')) 
         {
         console.log(changeInfo.url);
         currrent_url = changeInfo.url;

@@ -146,6 +146,13 @@ function SendingIsChecked()
         }        
 }
 
+function SendingCounters()
+{
+    if (currrent_url.includes('amazon'))
+    {
+        chrome.runtime.sendMessage({sendingCounters: counter})
+    }
+}
 function SendReload()
 {
     if (currrent_url.includes('amazon'))

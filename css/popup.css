@@ -5,6 +5,7 @@
     width: auto;
     text-align: center;
   }
+  
   div {
     border: 1px solid #dddddd;
     border-collapse: collapse;
@@ -112,4 +113,10 @@
     -moz-transition: All 0.3s ease;
     -o-transition: All 0.3s ease;
   }
-  
+  img {
+    display: block;
+    margin-left: auto;
+    width: 16px;
+    height: 16px;
+    margin-bottom: 10px;
+  }

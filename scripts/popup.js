@@ -12,6 +12,7 @@ document.body.onload = function()
  getData();
 }
 
+
 span.addEventListener('click', function() 
   {
     if (span.checked == true) 
@@ -120,8 +121,11 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
   };
 }); 
 
-/*
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.reload(tabs[0].id);
-  });
-  */
+
+document.getElementById('options').addEventListener('click', () => {
+  if (chrome.runtime.openOptionsPage) {
+    chrome.runtime.openOptionsPage();
+  } else {
+    window.open(chrome.runtime.getURL('options.html'));
+  }
+});

@@ -26,7 +26,6 @@ function SendAuthors()
 {
   chrome.runtime.sendMessage({SendingAuthors: authors}, function(response)
   {
-    console.log(response.answer);
   })
     location.reload();
 };
@@ -91,7 +90,6 @@ function show()
             {
               authors.splice(i,1);
               SendAuthors();;
-              console.log("Option seding Author Data as: Opt")
             });
 
             tr = document.createElement('tr');

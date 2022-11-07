@@ -16,8 +16,6 @@ const readLocalStorage = async (key) => {
     });
     };
 
-//getIsChecked();
-//GetItemsFromStorage();
 getAuthors();
 getCounters();
 getIsChecked();
@@ -46,7 +44,6 @@ async function getAuthors() {
                 {
                     insertAuthor(author.first_name,author.last_name);
                 }
-                console.log("Author list retrieved!");
         }
     catch {
                 console.log("error getting data!")
@@ -79,7 +76,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
 {
     chrome.tabs.get(activeInfo.tabId, function(tab)
     {
-        console.log(tab.url);
         currrent_url = tab.url;
         SetBadge(counter);
     });
@@ -89,7 +85,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
      if (!changeInfo.url == 'undefined') 
      {
-        console.log(changeInfo.url);
         currrent_url = changeInfo.url;
         SetBadge(counter);
     };
@@ -128,12 +123,9 @@ function SaveIsChecked(response)
         }
         if (!chrome.runtime.error)
         {
-            console.log('Saved ischecked to storage! ' + response);
             
         }
     })
-    
-    //setTimeout(() => {SendingIsChecked()}, 1000);
 };
 
 function SendingIsChecked()
@@ -168,7 +160,6 @@ function SaveAuthorData(response)
 {
     authors.length = 0;
     for (const author of response){
-        console.log(author);
         insertAuthor(author.first_name,author.last_name);
     }
     chrome.storage.sync.set({'authors': authors}, function() 
@@ -178,7 +169,6 @@ function SaveAuthorData(response)
         }
         if (!chrome.runtime.error)
         {
-            console.log('Saved Authors to storage!');
         }
     });
 };
@@ -194,66 +184,7 @@ function SaveCounter(response)
         }
         if (!chrome.runtime.error)
         {
-            console.log('Saved counter to storage!');
         }
     })
 };
 
-
-//setTimeout(() => {SetBadge();console.log('Setting Badge!')}, 5000);
-  
-
-/*
-function GetItemsFromStorage()
-{
-    chrome.storage.sync.get('authors', function(items) 
-    {
-        let empty = items.authors;
-        if (typeof empty ==="undefined")
-        {
-            console.log("Author list in storage is empty!");
-        }
-
-        else if (!chrome.runtime.error) 
-        {
-            authors.length = 0;
-            for (const author of items.authors) 
-            {
-                insertAuthor(author.first_name,author.last_name);
-            }
-            console.log("Author list retrieved!");
-        }
-    });
-
-    chrome.storage.sync.get('counter',function(items)
-    {
-        let empty = items.counter;
-        if (typeof empty === 'undefined' && empty != '')
-        {
-        }
-        else if (!chrome.runtime.error)
-        {
-            counter = empty;
-            console.log("Background retrieved coutner and its value is: " + counter);
-        }
-    });  
-};
-
-function getIsChecked()
-{
-    chrome.storage.sync.get('ischecked',function(items)
-    {
-        let empty = items.ischecked;
-        if (typeof empty === 'undefined' && empty != '')
-        {
-            console.log("isChecked in storage is missing!");
-        }
-        else if (!chrome.runtime.error)
-        {    
-            console.log("Background retrieved isCheck and its value is: " + empty);
-            ischecked = empty;
-        }
-    });
-   // if (typeof ischecked != 'undefined') SendingIsChecked();
-};
-*/

@@ -4,7 +4,6 @@ var isChecked = 'yes';
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
 		ischecked = request.ischeckedSending;
-		console.log("received ischeck. Value is: " + ischecked);
 		if (request.sendingCounters) counter = request.sendingCounters;
 	});
 
@@ -74,7 +73,6 @@ function getIsChecked()
 		console.log('Received ischeck! ' + response.Sendingischeck);	
 		ischecked = response.Sendingischeck; 
 	});
-  console.log('Recieved ischecked status: ' + isChecked)
 };
 
 
@@ -83,11 +81,3 @@ function getIsChecked()
  {
    chrome.runtime.sendMessage({SendingIsChecked: status});
  }     
-
-
-
-/*
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.reload(tabs[0].id);
-  });
-  */

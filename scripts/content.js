@@ -8,7 +8,6 @@ getIsChecked();
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
 		ischecked = request.ischeckedSending;
-		console.log("received ischeck. Value is: " + ischecked);
 		sendResponse({answer: "Received"});
 	});
 
@@ -19,7 +18,6 @@ chrome.runtime.sendMessage({question:"Authors"}, function(response)
 	for (const author of response.Sending) 
 		{
 			insertAuthor(author.first_name,author.last_name);
-			console.log(author.first_name + ' ' + author.last_name);
 		};
 		filter();
 });
@@ -39,8 +37,6 @@ function addObserverIfDesiredNodeAvailable() {
     }
     var config = {subtree: true, childList: true,characterData: true};
     composeObserver.observe(composeBox,config);
-	console.log('Observer Connected!');
-	
 };
 
 addObserverIfDesiredNodeAvailable();
@@ -87,8 +83,7 @@ function SendData(counter)
 	{
 		savedCounter = counter;
 		chrome.runtime.sendMessage({Counter: counter}, function(response) 
-		{
-			console.log(response.answer);	
+		{	
 		});
 	}
 };
@@ -98,8 +93,7 @@ function getIsChecked()
 	if (typeof ischecked != 'undefined' || ischecked != '')
 	{
 		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
-	{
-		console.log('Received ischeck! ' + response.Sendingischeck);	
+	{	
 		ischecked = response.Sendingischeck; 
 	});
 	filter();

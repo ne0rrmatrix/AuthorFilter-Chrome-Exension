@@ -11,6 +11,14 @@ chrome.runtime.onMessage.addListener(
 	});
 */
 
+document.getElementById('options').addEventListener('click', () => {
+  if (chrome.runtime.openOptionsPage) {
+    chrome.runtime.openOptionsPage();
+  } else {
+    window.open(chrome.runtime.getURL('options.html'));
+  }
+});
+
 span.addEventListener('click', function() 
 {
   if (span.checked == false) 

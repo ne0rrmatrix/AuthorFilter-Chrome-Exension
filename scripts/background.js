@@ -2,7 +2,7 @@ var authors = [];
 var sponsored = false;
 var counter = 0;
 var currrent_url = '';
-var ischecked;
+var ischecked = '';
 
 const readLocalStorage = async (key) => {
     return new Promise((resolve, reject) => {
@@ -68,7 +68,7 @@ async function getIsChecked() {
    try {
     let key3 = await readLocalStorage('ischecked');
     ischecked = key3;
-    SendingIsChecked(key3);
+   // SendingIsChecked(key3);
    }
    catch {
             console.log("error getting data!")

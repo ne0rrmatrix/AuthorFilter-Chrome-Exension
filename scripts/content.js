@@ -7,9 +7,10 @@ getIsChecked();
 
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
-		ischecked = request.ischeckedSending;
+		if (request.ischeckedSending) {ischecked = request.ischeckedSending;
 		console.log("received ischeck. Value is: " + ischecked);
-		sendResponse({answer: "Received"});
+		sendResponse({answer: "Received"});}
+		if (response.question == 'Counter') sendResponse({SendingCounter: counter})
 	});
 
 chrome.runtime.sendMessage({question:"Authors"}, function(response) 

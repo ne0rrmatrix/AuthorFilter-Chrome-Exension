@@ -1,15 +1,8 @@
 var counter = 0;
 var isChecked = '';
 var span = document.getElementById('btn');
+var currrent_url = '';
 
-/*
-chrome.runtime.onMessage.addListener(
-	(request, sender, sendResponse) => {
-		ischecked = request.ischeckedSending;
-		console.log("received ischeck. Value is: " + ischecked);
-		if (request.sendingCounters) counter = request.sendingCounters;
-	});
-*/
 
 document.getElementById('options').addEventListener('click', () => {
   if (chrome.runtime.openOptionsPage) {
@@ -23,7 +16,7 @@ span.addEventListener('click', function()
 {
   if (span.checked == false) 
   {
-  SendStatus('no')
+  SendStatus('no');
   } else 
   {
     SendStatus('yes');
@@ -31,11 +24,12 @@ span.addEventListener('click', function()
 })
 
 
-getIsChecked();
-getCounters();
 
 document.body.onload = function() 
 {
+  getCurrentUrl();
+  getIsChecked();
+  getCounters();
   LoadData();
 }
 
@@ -44,9 +38,9 @@ function getCounters()
 {
   chrome.runtime.sendMessage({question: 'Counter'}, function(response) 
   {
-    counter = response.SendingCounter;
-    console.log(response.SendingCounter);
-    LoadData(response.SendingCounter);
+     counter = response.SendingCounter;
+    console.log(counter);
+    LoadData();
   });
 }
 function filter() 
@@ -59,11 +53,17 @@ function filter()
 function LoadData()
 {
   filter();
-
+  if (currrent_url == '')
+  {
+    console.log('Current url is undefined');
+  }
+  let temp = 0;
+  if (currrent_url.includes('amazon')) {console.log('Current url is: ' + currrent_url); temp = counter;};
+  if (isChecked = 'yes' && currrent_url.includes('amazon')) {temp = counter};
   let h2 = document.createElement('h2');
   let tbody = document.createElement('tbody');
   let text = document.createTextNode('Authors Blocked');
-  let numbers_text = document.createTextNode(counter);
+  let numbers_text = document.createTextNode(temp);
 
   h2.appendChild(text);
   tbody.appendChild(h2);
@@ -78,24 +78,28 @@ function getIsChecked()
 {
 		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
 	{
-		console.log('Received ischeck! ' + response.Sendingischeck);	
-		ischecked = response.Sendingischeck; 
-    if (response.Sendingischeck== 'yes')span.checked = true;
-    else span.checked = false;
+		
+    if (response.Sendingischeck== 'yes' || response.Sendingischecked == ''){span.checked = true;}
+    else if (response.Sendingischeck == 'no') span.checked = false;
 	});
 };
 
 
+function getCurrentUrl()
+{
+  chrome.runtime.sendMessage({question: "url"},function(response)
+  {
+    console.log("Received url! " + response.SendingUrl);
+    currrent_url = response.SendingUrl;
+  })
+}
+
 
  function SendStatus(status)
  {
-   chrome.runtime.sendMessage({SendingIsChecked: status});
- }     
-
-
-
-/*
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.reload(tabs[0].id);
+  chrome.runtime.sendMessage({SendingIsChecked: status},function(response)
+  {
+    if (response.answer) {console.log(response.anwer);}
   });
-  */
+  // chrome.runtime.sendMessage({SendingIsChecked: status});
+ }     

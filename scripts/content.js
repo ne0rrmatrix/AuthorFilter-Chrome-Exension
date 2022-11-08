@@ -7,8 +7,7 @@ getIsChecked();
 
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
-		if (request.Sendingischeck) ischecked = request.Sendingischeck;
-		if (request.ischeckedSending) ischecked = ischeckedSending;
+		ischecked = request.ischeckedSending;
 		console.log("received ischeck. Value is: " + ischecked);
 		sendResponse({answer: "Received"});
 	});
@@ -51,7 +50,7 @@ setTimeout(() => {composeObserver.disconnect();console.log('Observer Disconnecte
 function filter() 
 {
 	let counter = 0;
-	if (ischecked == 'yes' || typeof ischecked == 'undefined')
+	if (ischecked == 'yes')
 	{
 		const arr = Array.from(document.querySelectorAll('[data-index]'))
 		for (let i = 0; i < arr.length; i++)
@@ -87,16 +86,23 @@ function SendData(counter)
 	if (counter > 0)
 	{
 		savedCounter = counter;
-		chrome.runtime.sendMessage({SendingCounter: counter});
+		chrome.runtime.sendMessage({Counter: counter}, function(response) 
+		{
+			console.log(response.answer);	
+		});
 	}
 };
 
 function getIsChecked()
 {
+	if (typeof ischecked != 'undefined' || ischecked != '')
+	{
 		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
 	{
 		console.log('Received ischeck! ' + response.Sendingischeck);	
 		ischecked = response.Sendingischeck; 
 	});
 	filter();
+	}
+	
 };

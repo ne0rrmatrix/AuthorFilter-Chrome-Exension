@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener(
     if (request.question === 'Authors') sendResponse({Sending: authors});
     if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors); sendResponse({answer: "Background received Author update!"})};
     if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-    if (request.SendingIsChecked) {sendResponse({answer: "Background recieved ischeck" + request.SendingIsChecked}); ischecked = request.SendingIsChecked;console.log('Background received ischeck: value is: ' + ischecked);SaveIsChecked(request.SendingIsChecked)};
+    if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;console.log('Background received ischeck: value is: ' + ischecked);SaveIsChecked(request.SendingIsChecked)};
     if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked });console.log("Background sent ischeck: Value is: " + ischecked)};
     if (request.question === 'url') sendResponse({SendingUrl: currrent_url});
     

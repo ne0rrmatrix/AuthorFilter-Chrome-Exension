@@ -39,7 +39,6 @@ function getCounters()
   chrome.runtime.sendMessage({question: 'Counter'}, function(response) 
   {
      counter = response.SendingCounter;
-    console.log(counter);
     LoadData();
   });
 }
@@ -53,12 +52,8 @@ function filter()
 function LoadData()
 {
   filter();
-  if (currrent_url == '')
-  {
-    console.log('Current url is undefined');
-  }
   let temp = 0;
-  if (currrent_url.includes('amazon')) {console.log('Current url is: ' + currrent_url); temp = counter;};
+  if (currrent_url.includes('amazon')) {temp = counter;};
   if (isChecked = 'yes' && currrent_url.includes('amazon')) {temp = counter};
   let h2 = document.createElement('h2');
   let tbody = document.createElement('tbody');
@@ -89,7 +84,7 @@ function getCurrentUrl()
 {
   chrome.runtime.sendMessage({question: "url"},function(response)
   {
-    console.log("Received url! " + response.SendingUrl);
+    if (response.SendingUrl)
     currrent_url = response.SendingUrl;
   })
 }
@@ -97,9 +92,5 @@ function getCurrentUrl()
 
  function SendStatus(status)
  {
-  chrome.runtime.sendMessage({SendingIsChecked: status},function(response)
-  {
-    if (response.answer) {console.log(response.anwer);}
-  });
-  // chrome.runtime.sendMessage({SendingIsChecked: status});
- }     
+  chrome.runtime.sendMessage({SendingIsChecked: status});
+}

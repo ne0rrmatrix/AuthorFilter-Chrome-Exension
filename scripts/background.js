@@ -18,7 +18,6 @@ const readLocalStorage = async (key) => {
 
 
 getAuthors();
-//getCounters();
 getIsChecked();
 
 
@@ -47,10 +46,8 @@ async function getAuthors() {
                 {
                     insertAuthor(author.first_name,author.last_name);
                 }
-                console.log("Author list retrieved!");
         }
     catch {
-                console.log("error getting author data!")
     }
 }
 
@@ -60,7 +57,6 @@ async function getCounters() {
         counter = key2;
     }
     catch {
-                console.log("error getting counter data!")
     }
 } 
 
@@ -70,7 +66,6 @@ async function getIsChecked() {
     ischecked = key3;
    }
    catch {
-            console.log("error getting ischecked data!")
    }
    
 }
@@ -125,14 +120,13 @@ function insertAuthor(first,last)
 function SaveIsChecked(response)
 {
     ischecked = response;
-    SendingIsChecked();
+   // SendingIsChecked();
     chrome.storage.sync.set({'ischecked': response}, function(){
         if (chrome.runtime.error) {
             console.log("runtime error.");
         }
         if (!chrome.runtime.error)
         {
-            console.log('Saved ischecked to storage! ' + response);
             
         }
     })
@@ -184,7 +178,6 @@ function SaveAuthorData(response)
         }
         if (!chrome.runtime.error)
         {
-            console.log('Saved Authors to storage!');
         }
     });
 };
@@ -201,11 +194,9 @@ function SaveCounter(response)
         }
         if (!chrome.runtime.error)
         {
-            console.log('Saved counter to storage!');
         }
     })
 };
 
 
-//setTimeout(() => {SetBadge();console.log('Setting Badge!')}, 5000);
-  
+

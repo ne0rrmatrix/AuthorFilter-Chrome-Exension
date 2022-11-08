@@ -68,7 +68,6 @@ async function getIsChecked() {
    try {
     let key3 = await readLocalStorage('ischecked');
     ischecked = key3;
-   // SendingIsChecked(key3);
    }
    catch {
             console.log("error getting data!")

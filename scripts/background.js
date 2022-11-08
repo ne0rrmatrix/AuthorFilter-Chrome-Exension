@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener(
         if (request.question === 'Authors') sendResponse({Sending: authors});
         if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors)};
         if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked)};
+        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge();};
         if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
         if (request.question === 'url') sendResponse({SendingUrl: currrent_url});    
     });
@@ -88,15 +88,19 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 
 function SetBadge()
 {
-    if (!currrent_url.includes('amazon'))
+    if (!currrent_url.includes('amazon') || ischecked == 'no')
     {
         chrome.action.setBadgeText({text: "0"});
         chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
     }
     else
     {
-        chrome.action.setBadgeText({text: counter.toString()});
-        chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
+        if (ischecked == 'yes')
+        {
+            chrome.action.setBadgeText({text: counter.toString()});
+            chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
+        }
+       
     }    
 }; 
 

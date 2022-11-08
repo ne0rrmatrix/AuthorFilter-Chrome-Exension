@@ -25,7 +25,6 @@ span.addEventListener('click', function()
     isChecked = 'yes';
     SendStatus('yes');
     getCurrentUrl();
-   // getCounters();
     LoadData();
   }
 })

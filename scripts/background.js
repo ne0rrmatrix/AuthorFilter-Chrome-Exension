@@ -50,7 +50,7 @@ async function getAuthors() {
                 console.log("Author list retrieved!");
         }
     catch {
-                console.log("error getting data!")
+                console.log("error getting author data!")
     }
 }
 
@@ -60,7 +60,7 @@ async function getCounters() {
         counter = key2;
     }
     catch {
-                console.log("error getting data!")
+                console.log("error getting counter data!")
     }
 } 
 
@@ -70,7 +70,7 @@ async function getIsChecked() {
     ischecked = key3;
    }
    catch {
-            console.log("error getting data!")
+            console.log("error getting ischecked data!")
    }
    
 }

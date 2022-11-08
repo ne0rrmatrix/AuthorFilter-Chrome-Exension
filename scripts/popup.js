@@ -16,10 +16,17 @@ span.addEventListener('click', function()
 {
   if (span.checked == false) 
   {
+    isChecked = 'no';
+  counter = 0;
   SendStatus('no');
+  LoadData();
   } else 
   {
+    isChecked = 'yes';
     SendStatus('yes');
+    getCurrentUrl();
+    getCounters();
+    LoadData();
   }
 })
 
@@ -54,7 +61,7 @@ function LoadData()
   filter();
   let temp = 0;
   if (currrent_url.includes('amazon')) {temp = counter;};
-  if (isChecked = 'yes' && currrent_url.includes('amazon')) {temp = counter};
+  if (isChecked == 'yes' && currrent_url.includes('amazon')) {temp = counter};
   let h2 = document.createElement('h2');
   let tbody = document.createElement('tbody');
   let text = document.createTextNode('Authors Blocked');

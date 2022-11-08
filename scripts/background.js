@@ -24,18 +24,13 @@ getIsChecked();
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
-    console.log(sender.tab ?
-                "from a content script:" + sender.tab.url :
-                "from the extension");
-
-    if (request.Counter) {counter = request.Counter;SetBadge();sendResponse({answer: "Counters sent!"})}
-    if (request.question === 'Authors') sendResponse({Sending: authors});
-    if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors); sendResponse({answer: "Background received Author update!"})};
-    if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-    if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;console.log('Background received ischeck: value is: ' + ischecked);SaveIsChecked(request.SendingIsChecked)};
-    if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked });console.log("Background sent ischeck: Value is: " + ischecked)};
-    if (request.question === 'url') sendResponse({SendingUrl: currrent_url});
-    
+        if (request.Counter) {counter = request.Counter;SetBadge();sendResponse({answer: "Counters sent!"})}
+        if (request.question === 'Authors') sendResponse({Sending: authors});
+        if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors); sendResponse({answer: "Background received Author update!"})};
+        if (request.question === 'Counter') sendResponse({SendingCounter: counter});
+        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked)};
+        if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
+        if (request.question === 'url') sendResponse({SendingUrl: currrent_url});    
     });
 
 async function getAuthors() {
@@ -75,7 +70,6 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
 {
     chrome.tabs.get(activeInfo.tabId, function(tab)
     {
-        console.log(tab.url);
         currrent_url = tab.url;
         SetBadge(counter);
     });
@@ -86,7 +80,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 {
      if (!changeInfo.url == 'undefined') 
      {
-        console.log(changeInfo.url);
         currrent_url = changeInfo.url;
         SetBadge(counter);
     };
@@ -123,7 +116,6 @@ function SaveIsChecked(response)
    // SendingIsChecked();
     chrome.storage.sync.set({'ischecked': response}, function(){
         if (chrome.runtime.error) {
-            console.log("runtime error.");
         }
         if (!chrome.runtime.error)
         {
@@ -168,13 +160,11 @@ function SaveAuthorData(response)
 {
     authors.length = 0;
     for (const author of response){
-        console.log(author);
         insertAuthor(author.first_name,author.last_name);
     }
     chrome.storage.sync.set({'authors': authors}, function() 
     {
         if (chrome.runtime.error) {
-            console.log("runtime error.");
         }
         if (!chrome.runtime.error)
         {
@@ -185,12 +175,10 @@ function SaveAuthorData(response)
 
 function SaveCounter(response)
 {
-    console.log('Counter current value is: ' + response);
     chrome.storage.sync.set({'counter': response}, function()
     {
         if (chrome.runtime.error)
         {
-            console.log('runtime error.');
         }
         if (!chrome.runtime.error)
         {

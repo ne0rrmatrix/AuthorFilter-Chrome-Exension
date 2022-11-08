@@ -98,7 +98,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
  }); 
 
 
-function SetBadge(response)
+function SetBadge()
 {
     if (!currrent_url.includes('amazon'))
     {

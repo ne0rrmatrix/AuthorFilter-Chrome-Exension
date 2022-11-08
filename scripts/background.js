@@ -24,9 +24,9 @@ getIsChecked();
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
-        if (request.Counter) {counter = request.Counter;SetBadge();sendResponse({answer: "Counters sent!"})}
+        if (request.Counter) {counter = request.Counter;SetBadge();}
         if (request.question === 'Authors') sendResponse({Sending: authors});
-        if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors); sendResponse({answer: "Background received Author update!"})};
+        if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors)};
         if (request.question === 'Counter') sendResponse({SendingCounter: counter});
         if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked)};
         if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
@@ -125,34 +125,12 @@ function SaveIsChecked(response)
 };
 
 
-function SendingIsChecked()
-{
-        if (currrent_url.includes('amazon'))
-        {
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, {ischeckedSending: ischecked})
-                });
-        }        
-}
-
-
 function SendingCounters()
 {
     if (currrent_url.includes('amazon'))
     {
         chrome.runtime.sendMessage({sendingCounters: counter})
     }
-}
-
-
-function SendReload()
-{
-    if (currrent_url.includes('amazon'))
-    {
-         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.reload(tabs[0].id)})
-    };
-   
 }
 
 

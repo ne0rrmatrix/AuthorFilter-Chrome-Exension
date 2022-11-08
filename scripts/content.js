@@ -7,20 +7,16 @@ getIsChecked();
 
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
-		if (request.ischeckedSending) {sendResponse({answer: "Received"});ischecked = request.ischeckedSending;
-		console.log("received ischeck. Value is: " + ischecked);
-		sendResponse({answer: "Received"});}
+		if (request.ischeckedSending) {ischecked = request.ischeckedSending;}
 		if (response.question == 'Counter') sendResponse({SendingCounter: counter})
 	});
 
 chrome.runtime.sendMessage({question:"Authors"}, function(response) 
 {
 	authors.length = 0;
-	console.log('Received author list!');
 	for (const author of response.Sending) 
 		{
 			insertAuthor(author.first_name,author.last_name);
-			console.log(author.first_name + ' ' + author.last_name);
 		};
 		filter();
 });
@@ -40,13 +36,12 @@ function addObserverIfDesiredNodeAvailable() {
     }
     var config = {subtree: true, childList: true,characterData: true};
     composeObserver.observe(composeBox,config);
-	console.log('Observer Connected!');
 	
 };
 
 addObserverIfDesiredNodeAvailable();
 
-setTimeout(() => {composeObserver.disconnect();console.log('Observer Disconnected!');addObserverIfDesiredNodeAvailable();}, 5000);
+setTimeout(() => {composeObserver.disconnect();addObserverIfDesiredNodeAvailable();}, 5000);
 
 function filter() 
 {
@@ -62,7 +57,6 @@ function filter()
 					{ 
 						arr[i].innerHTML ='';
 						counter +=1;
-						console.log(author.first_name + " " + author.last_name + " deleted!")
 					}
 				}
 		}
@@ -87,10 +81,7 @@ function SendData(counter)
 	if (counter > 0)
 	{
 		savedCounter = counter;
-		chrome.runtime.sendMessage({Counter: counter}, function(response) 
-		{
-			console.log(response.answer);	
-		});
+		chrome.runtime.sendMessage({Counter: counter})
 	}
 };
 
@@ -100,8 +91,7 @@ function getIsChecked()
 	{
 		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
 	{
-		console.log('Received ischeck! ' + response.Sendingischeck);	
-		ischecked = response.Sendingischeck; 
+		if (response.Sendingischeck) ischecked = response.Sendingischeck; 
 	});
 	filter();
 	}

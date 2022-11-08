@@ -24,10 +24,7 @@ document.body.onload = function()
 
 function SendAuthors()
 {
-  chrome.runtime.sendMessage({SendingAuthors: authors}, function(response)
-  {
-    console.log(response.answer);
-  })
+  chrome.runtime.sendMessage({SendingAuthors: authors});
     location.reload();
 };
 
@@ -90,8 +87,7 @@ function show()
             btnDel.addEventListener('click', () => 
             {
               authors.splice(i,1);
-              SendAuthors();;
-              console.log("Option seding Author Data as: Opt")
+              SendAuthors();
             });
 
             tr = document.createElement('tr');

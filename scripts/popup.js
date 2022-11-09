@@ -9,7 +9,7 @@ document.getElementById('options').addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   } else {
     window.open(chrome.runtime.getURL('options.html'));
-  }
+  };
 });
 
 span.addEventListener('click', function() 
@@ -26,8 +26,8 @@ span.addEventListener('click', function()
     SendStatus('yes');
     getCurrentUrl();
     LoadData();
-  }
-})
+  };
+});
 
 
 
@@ -37,7 +37,7 @@ document.body.onload = function()
   getIsChecked();
   getCounters();
   LoadData();
-}
+};
 
 
 function getCounters()
@@ -47,12 +47,14 @@ function getCounters()
      counter = response.SendingCounter;
     LoadData();
   });
-}
+};
+
+
 function filter() 
 {
     const arr = document.querySelector('div');
     arr.innerHTML ='';
-}
+};
 
 
 function LoadData()
@@ -74,7 +76,7 @@ function LoadData()
   tbody.appendChild(h2);
   
   document.getElementById("AuthorsBlocked").appendChild(tbody);
-} 
+}; 
 
 function getIsChecked()
 {
@@ -94,10 +96,10 @@ function getCurrentUrl()
     if (response.SendingUrl)
     currrent_url = response.SendingUrl;
   })
-}
+};
 
 
- function SendStatus(status)
- {
+function SendStatus(status)
+{
   chrome.runtime.sendMessage({SendingIsChecked: status});
-}
+};

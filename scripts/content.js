@@ -21,9 +21,16 @@ chrome.runtime.onMessage.addListener(
 
 const composeObserver = new MutationObserver(() => 
 {
-	filter();
+	composeObserver.disconnect();
+	reload();
 });
 
+async function reload()
+{
+	await filter();
+	addObserverIfDesiredNodeAvailable();
+	return;
+}
 
 document.body.onload = function() 
 {
@@ -35,7 +42,8 @@ async function loading()
 {
 	await getAuthors();
 	await getIsChecked();
-	filter();
+	await filter();
+	
 	return;
 }
 
@@ -50,10 +58,11 @@ function addObserverIfDesiredNodeAvailable() {
     };
     var config = {subtree: true, childList: true,characterData: true};
     composeObserver.observe(composeBox,config);
+	return;
 };
 
 
-function filter() 
+async function filter() 
 {
 		composeObserver.disconnect();
 		if (ischecked == 'yes' || ischecked == '')
@@ -72,8 +81,9 @@ function filter()
 					};
 			};
 			SendData(savedCounter);
-			addObserverIfDesiredNodeAvailable();
 		};
+		addObserverIfDesiredNodeAvailable();
+		return;
 };
 
 

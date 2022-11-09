@@ -17,7 +17,7 @@ span.addEventListener('click', function()
   if (span.checked == false) 
   {
     isChecked = 'no';
-  counter = 0;
+  // counter = 0;
   SendStatus('no');
   LoadData();
   } else 

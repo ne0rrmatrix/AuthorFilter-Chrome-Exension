@@ -17,13 +17,18 @@ chrome.runtime.onMessage.addListener(
 	});
 
 
-
-
-
 const composeObserver = new MutationObserver(() => 
 {
 	filter();
 });
+
+
+
+document.body.onload = function() 
+{
+	loading();
+};
+
 
 async function loading()
 {
@@ -32,10 +37,6 @@ async function loading()
 	filter();
 	return;
 }
-document.body.onload = function() 
-{
-	loading();
-};
 
 
 function addObserverIfDesiredNodeAvailable() {
@@ -69,7 +70,6 @@ function filter()
 						};
 					};
 			};
-
 			SendData(savedCounter);
 			addObserverIfDesiredNodeAvailable();
 		};

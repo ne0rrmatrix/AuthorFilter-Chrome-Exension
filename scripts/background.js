@@ -21,8 +21,6 @@ getAuthors();
 getIsChecked();
 
 
-
-
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
@@ -48,6 +46,7 @@ async function getAuthors() {
     }
 }
 
+
 async function getCounters() {
     try {
         let key2 = await readLocalStorage('counter');
@@ -57,7 +56,9 @@ async function getCounters() {
     }
 } 
 
-async function getIsChecked() {
+
+async function getIsChecked() 
+{
    try {
     let key3 = await readLocalStorage('ischecked');
     ischecked = key3;
@@ -65,8 +66,7 @@ async function getIsChecked() {
    }
    catch {
    }
-   
-}
+};
 
 
 chrome.tabs.onActivated.addListener(function(activeInfo) 
@@ -102,9 +102,8 @@ function SetBadge()
         {
             chrome.action.setBadgeText({text: counter.toString()});
             chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
-        }
-       
-    }    
+        } 
+    };
 }; 
 
 
@@ -122,13 +121,14 @@ function SaveIsChecked(response)
     ischecked = response;
     
     chrome.storage.sync.set({'ischecked': response}, function(){
-        if (chrome.runtime.error) {
-        }
+        if (chrome.runtime.error) 
+        {
+        };
         if (!chrome.runtime.error)
         {
             console.log('Saved ischeck: ' + ischecked);        
-        }
-    })
+        };
+    });
 };
 
 
@@ -137,8 +137,8 @@ function SendingCounters()
     if (currrent_url.includes('amazon'))
     {
         chrome.runtime.sendMessage({sendingCounters: counter})
-    }
-}
+    };
+};
 
 
 function SaveAuthorData(response)
@@ -146,14 +146,15 @@ function SaveAuthorData(response)
     authors.length = 0;
     for (const author of response){
         insertAuthor(author.first_name,author.last_name);
-    }
+    };
     chrome.storage.sync.set({'authors': authors}, function() 
     {
-        if (chrome.runtime.error) {
-        }
+        if (chrome.runtime.error) 
+        {
+        };
         if (!chrome.runtime.error)
         {
-        }
+        };
     });
 };
 
@@ -164,10 +165,10 @@ function SaveCounter(response)
     {
         if (chrome.runtime.error)
         {
-        }
+        };
         if (!chrome.runtime.error)
         {
-        }
+        };
     })
 };
 

@@ -17,18 +17,7 @@ chrome.runtime.onMessage.addListener(
 	});
 
 
-function getAuthors()
-{
-	chrome.runtime.sendMessage({question:"Authors"}, function(response) 
-	{
-		authors.length = 0;
-		for (const author of response.Sending) 
-			{
-				insertAuthor(author.first_name,author.last_name);
-			};
-			filter();
-	});
-};
+
 
 
 const composeObserver = new MutationObserver(() => 
@@ -36,12 +25,16 @@ const composeObserver = new MutationObserver(() =>
 	filter();
 });
 
-
+async function loading()
+{
+	await getAuthors();
+	await getIsChecked();
+	filter();
+	return;
+}
 document.body.onload = function() 
 {
-	getIsChecked();
-	getAuthors();
-	filter()
+	loading();
 };
 
 
@@ -102,13 +95,26 @@ function SendData(counter)
 };
 
 
-function getIsChecked()
+async function getIsChecked()
 {
-	
 		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
 	{
 		if (response.Sendingischeck) {ischecked = response.Sendingischeck;}; 
 	});
+	return;
+};
+
+async function getAuthors()
+{
+	chrome.runtime.sendMessage({question:"Authors"}, function(response) 
+	{
+		authors.length = 0;
+		for (const author of response.Sending) 
+			{
+				insertAuthor(author.first_name,author.last_name);
+			};
+	});
+	return;
 };
 
 

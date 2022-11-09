@@ -1,4 +1,6 @@
 let authors = [];
+
+
 function insertAuthor(first,last) 
 {
   let name = {}
@@ -6,6 +8,7 @@ function insertAuthor(first,last)
   name.last_name = last;
   authors.push(name);
 };
+
 
 document.body.onload = function() 
 {
@@ -26,7 +29,7 @@ function filter()
 {
     const arr = document.getElementById('blocklist');
     arr.innerHTML ='';
-}
+};
 
 
 function SendAuthors()
@@ -35,6 +38,7 @@ function SendAuthors()
     filter();
     show();
 };
+
 
 function show() 
 {

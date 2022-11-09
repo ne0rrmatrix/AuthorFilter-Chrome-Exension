@@ -104,6 +104,7 @@ async function getIsChecked()
 	return;
 };
 
+
 async function getAuthors()
 {
 	chrome.runtime.sendMessage({question:"Authors"}, function(response) 

@@ -10,15 +10,11 @@ var clicked = false;
 let counter = 0;
 
 
-
-
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
-		if (request.ischeckedSending) {ischecked = request.ischeckedSending;}
-		if (response.question == 'Counter') sendResponse({SendingCounter: counter})
+		if (request.ischeckedSending) {ischecked = request.ischeckedSending;};
+		if (response.question == 'Counter') sendResponse({SendingCounter: counter});
 	});
-
-	
 
 
 function getAuthors()
@@ -32,8 +28,7 @@ function getAuthors()
 			};
 			filter();
 	});
-}
-
+};
 
 
 const composeObserver = new MutationObserver(() => 
@@ -47,21 +42,19 @@ document.body.onload = function()
 	getIsChecked();
 	getAuthors();
 	filter()
-}
-
-
+};
 
 
 function addObserverIfDesiredNodeAvailable() {
     var composeBox = document.querySelector('#search');
 	
-    if(!composeBox) {
+    if(!composeBox) 
+	{
         window.setTimeout(addObserverIfDesiredNodeAvailable,500);
         return;
-    }
+    };
     var config = {subtree: true, childList: true,characterData: true};
     composeObserver.observe(composeBox,config);
-	
 };
 
 
@@ -80,13 +73,13 @@ function filter()
 							arr[i].innerHTML ='';
 							counter = counter + 1;
 								savedCounter = counter;
-						}
-					}
+						};
+					};
 			};
 
 			SendData(savedCounter);
 			addObserverIfDesiredNodeAvailable();
-		}
+		};
 };
 
 
@@ -105,7 +98,7 @@ function SendData(counter)
 	{
 		savedCounter = counter;
 		chrome.runtime.sendMessage({Counter: counter})
-	}
+	};
 };
 
 
@@ -116,7 +109,8 @@ function getIsChecked()
 	{
 		if (response.Sendingischeck) {ischecked = response.Sendingischeck;}; 
 	});
-}
+};
+
 
 window.addEventListener('click', () => {
 counter = 0;

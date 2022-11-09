@@ -24,9 +24,7 @@ document.body.onload = function()
 
 function SendAuthors()
 {
-  chrome.runtime.sendMessage({SendingAuthors: authors}, function(response)
-  {
-  })
+  chrome.runtime.sendMessage({SendingAuthors: authors});
     location.reload();
 };
 
@@ -89,7 +87,7 @@ function show()
             btnDel.addEventListener('click', () => 
             {
               authors.splice(i,1);
-              SendAuthors();;
+              SendAuthors();
             });
 
             tr = document.createElement('tr');

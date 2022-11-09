@@ -2,7 +2,7 @@ var authors = [];
 var sponsored = false;
 var counter = 0;
 var currrent_url = '';
-var ischecked;
+var ischecked = '';
 
 const readLocalStorage = async (key) => {
     return new Promise((resolve, reject) => {
@@ -16,24 +16,21 @@ const readLocalStorage = async (key) => {
     });
     };
 
+
 getAuthors();
-getCounters();
 getIsChecked();
 
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
-    console.log(sender.tab ?
-                "from a content script:" + sender.tab.url :
-                "from the extension");
-    if (request.Counter) {SaveCounter(request.Counter);SetBadge(request.Counter);sendResponse({answer: "Counters sent!"})}
-    if (request.question === 'Authors') sendResponse({Sending: authors});
-    if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors); sendResponse({answer: "Background received Author update!"})};
-    if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-    if (request.SendingIsChecked) {SaveIsChecked(request.SendingIsChecked)};
-    if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
-    
+        if (request.Counter) {counter = request.Counter;SetBadge();}
+        if (request.question === 'Authors') sendResponse({Sending: authors});
+        if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors)};
+        if (request.question === 'Counter') sendResponse({SendingCounter: counter});
+        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge();};
+        if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
+        if (request.question === 'url') sendResponse({SendingUrl: currrent_url});    
     });
 
 async function getAuthors() {
@@ -46,7 +43,6 @@ async function getAuthors() {
                 }
         }
     catch {
-                console.log("error getting data!")
     }
 }
 
@@ -56,7 +52,6 @@ async function getCounters() {
         counter = key2;
     }
     catch {
-                console.log("error getting data!")
     }
 } 
 
@@ -64,13 +59,12 @@ async function getIsChecked() {
    try {
     let key3 = await readLocalStorage('ischecked');
     ischecked = key3;
-    SendingIsChecked(key3);
    }
    catch {
-            console.log("error getting data!")
    }
    
 }
+
 
 chrome.tabs.onActivated.addListener(function(activeInfo) 
 {
@@ -81,6 +75,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
     });
 }); 
   
+
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
 {
      if (!changeInfo.url == 'undefined') 
@@ -91,19 +86,24 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
  }); 
 
 
-function SetBadge(response)
+function SetBadge()
 {
-    if (!currrent_url.includes('amazon'))
+    if (!currrent_url.includes('amazon') || ischecked == 'no')
     {
         chrome.action.setBadgeText({text: "0"});
         chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
     }
     else
     {
-        chrome.action.setBadgeText({text: response.toString()});
-        chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
+        if (ischecked == 'yes')
+        {
+            chrome.action.setBadgeText({text: counter.toString()});
+            chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
+        }
+       
     }    
 }; 
+
 
 function insertAuthor(first,last) 
 {
@@ -113,13 +113,13 @@ function insertAuthor(first,last)
     authors.push(name);
 };
 
+
 function SaveIsChecked(response)
 {
     ischecked = response;
-    SendingIsChecked();
+   // SendingIsChecked();
     chrome.storage.sync.set({'ischecked': response}, function(){
         if (chrome.runtime.error) {
-            console.log("runtime error.");
         }
         if (!chrome.runtime.error)
         {
@@ -128,15 +128,6 @@ function SaveIsChecked(response)
     })
 };
 
-function SendingIsChecked()
-{
-        if (currrent_url.includes('amazon'))
-        {
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, {ischeckedSending: ischecked})
-                });
-        }        
-}
 
 function SendingCounters()
 {
@@ -144,15 +135,6 @@ function SendingCounters()
     {
         chrome.runtime.sendMessage({sendingCounters: counter})
     }
-}
-function SendReload()
-{
-    if (currrent_url.includes('amazon'))
-    {
-         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.reload(tabs[0].id)})
-    };
-   
 }
 
 
@@ -165,7 +147,6 @@ function SaveAuthorData(response)
     chrome.storage.sync.set({'authors': authors}, function() 
     {
         if (chrome.runtime.error) {
-            console.log("runtime error.");
         }
         if (!chrome.runtime.error)
         {
@@ -173,18 +154,19 @@ function SaveAuthorData(response)
     });
 };
 
+
 function SaveCounter(response)
 {
-    console.log('Counter current value is: ' + response);
     chrome.storage.sync.set({'counter': response}, function()
     {
         if (chrome.runtime.error)
         {
-            console.log('runtime error.');
         }
         if (!chrome.runtime.error)
         {
         }
     })
 };
+
+
 

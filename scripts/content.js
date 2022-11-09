@@ -1,7 +1,7 @@
 var authors = [];
 var sponsored = false;
 var savedCounter = 0;
-var ischecked;
+var ischecked = '';
 
 getIsChecked();
 
@@ -46,7 +46,7 @@ setTimeout(() => {composeObserver.disconnect();addObserverIfDesiredNodeAvailable
 function filter() 
 {
 	let counter = 0;
-	if (ischecked == 'yes')
+	if (ischecked == 'yes' || ischecked == '')
 	{
 		const arr = Array.from(document.querySelectorAll('[data-index]'))
 		for (let i = 0; i < arr.length; i++)

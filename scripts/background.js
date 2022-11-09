@@ -95,7 +95,7 @@ function SetBadge()
     }
     else
     {
-        if (ischecked == 'yes')
+        if (ischecked == 'yes' || ischecked == '')
         {
             chrome.action.setBadgeText({text: counter.toString()});
             chrome.action.setBadgeBackgroundColor({color: '#9688F1'});

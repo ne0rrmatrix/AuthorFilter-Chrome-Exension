@@ -1,3 +1,6 @@
+// TODO Make function async and add await.
+// TODO Fix any spacing and formatting.
+
 var counter = 0;
 var isChecked = '';
 var span = document.getElementById('btn');

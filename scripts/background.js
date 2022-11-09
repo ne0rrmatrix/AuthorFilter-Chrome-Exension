@@ -1,3 +1,6 @@
+//TODO Make functions async and add await.
+//TODO Fix spacing and formatting.
+
 var authors = [];
 var sponsored = false;
 var counter = 0;

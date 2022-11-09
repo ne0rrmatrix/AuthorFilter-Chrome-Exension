@@ -1,6 +1,8 @@
-// TODO clean up variable so that I only use one counter!!!
-// TODO clean up console logs.
+// TODO Clean up variable so that I only use one counter!!!
+// TODO Clean up console logs.
 // TODO test test test!!!!
+// TODO Make function async and add await.
+// TODO Clean up spacing, fix any formatting.
 
 var authors = [];
 var sponsored = false;

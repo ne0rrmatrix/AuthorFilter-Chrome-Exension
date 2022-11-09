@@ -1,9 +1,25 @@
+// TODO clean up variable so that I only use one counter!!!
+// TODO clean up console logs.
+// TODO test test test!!!!
+
 var authors = [];
 var sponsored = false;
 var savedCounter = 0;
 var ischecked = '';
-
+var clicked = false;
 var mutations = 0;
+let counter = 0;
+
+window.addEventListener('click', () => {
+	console.log('clicked!');
+//	clicked = true;
+	//mutations = 0;
+	counter = 0;
+	savedCounter = 0;
+//	composeObserver.disconnect();
+	filter();
+  });
+
 
 chrome.runtime.onMessage.addListener(
 	(request, sender, sendResponse) => {
@@ -11,35 +27,38 @@ chrome.runtime.onMessage.addListener(
 		if (response.question == 'Counter') sendResponse({SendingCounter: counter})
 	});
 
+
 chrome.runtime.sendMessage({question:"Authors"}, function(response) 
 {
 	authors.length = 0;
+	//console.log(response.Sending);
 	for (const author of response.Sending) 
 		{
 			insertAuthor(author.first_name,author.last_name);
 		};
-	composeObserver.disconnect();
-	mutations = 0;
+	//mutations = 0;
 	filter();
 });
+
 
 const composeObserver = new MutationObserver(() => 
 {
-	mutations += 1;
-	console.log('Page mutation!!!' + mutations);
+	//mutations += 1;
+//	console.log('Page mutation!!!' + mutations);
+	
 	filter();
 });
 
+
 document.body.onload = function() 
 {
-	counter = 0;
-	if (mutations > 0) composeObserver.disconnect();
-	mutations = 0;
-	console.log('observer connnected!');
 	console.log("page loaded!");
-	console.log('Page mutation!!!' + mutations);
-	getIsChecked();
+	if (mutations > 0) console.log('Page mutation!!!' + mutations);
+	filter()
 }
+
+
+
 
 function addObserverIfDesiredNodeAvailable() {
     var composeBox = document.querySelector('#search');
@@ -54,38 +73,37 @@ function addObserverIfDesiredNodeAvailable() {
 };
 
 
+//setTimeout(() => {composeObserver.disconnect();addObserverIfDesiredNodeAvailable();}, 5000);
 
-setTimeout(() => {composeObserver.disconnect();addObserverIfDesiredNodeAvailable();}, 5000);
 
 function filter() 
 {
-	composeObserver.disconnect();
-	console.log('observer disconnected!')
-	let counter = 0;
-	if (ischecked == 'yes' || ischecked == '')
-	{
-		const arr = Array.from(document.querySelectorAll('[data-index]'))
-		for (let i = 0; i < arr.length; i++)
+		composeObserver.disconnect();
+		if (ischecked == 'yes' || ischecked == '')
 		{
-				for (author of authors)
-				{
-					if (arr[i].textContent.includes(author.first_name) && arr[i].textContent.includes(author.last_name)) 
-					{ 
-						arr[i].innerHTML ='';
-						counter +=1;
+			const arr = Array.from(document.querySelectorAll('[data-index]'))
+			for (let i = 0; i < arr.length; i++)
+			{
+					for (author of authors)
+					{
+						if (arr[i].textContent.includes(author.first_name) && arr[i].textContent.includes(author.last_name)) 
+						{ 
+							arr[i].innerHTML ='';
+							counter = counter + 1;
+							console.log(counter);
+								savedCounter = counter;
+						}
 					}
-				}
+			}
+		//	console.log('counter is: ' + savedCounter)
+			
+			SendData(savedCounter);
+			addObserverIfDesiredNodeAvailable();
+		//	console.log('observer connnected!')
+			console.log('Saved counter is: ' + savedCounter)
 		}
-		if (counter > savedCounter) 
-		{
-			savedCounter = counter;
-			SendData(counter);
-		}	
-	}
-	addObserverIfDesiredNodeAvailable();
-	console.log('observer connnected!')
-	
 };
+
 
 function insertAuthor(first,last) 
 {
@@ -94,6 +112,7 @@ function insertAuthor(first,last)
 	name.last_name = last;
 	authors.push(name);
 };
+
 
 function SendData(counter)
 {
@@ -104,13 +123,12 @@ function SendData(counter)
 	}
 };
 
+
 function getIsChecked()
 {
-	if (typeof ischecked != 'undefined' || ischecked != '')
-	{
+	
 		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
 	{
 		if (response.Sendingischeck) ischecked = response.Sendingischeck; 
 	});
-	}
-};
+}

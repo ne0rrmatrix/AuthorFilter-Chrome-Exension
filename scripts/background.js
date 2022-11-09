@@ -21,6 +21,8 @@ getAuthors();
 getIsChecked();
 
 
+
+
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
@@ -117,7 +119,7 @@ function insertAuthor(first,last)
 function SaveIsChecked(response)
 {
     ischecked = response;
-   // SendingIsChecked();
+    
     chrome.storage.sync.set({'ischecked': response}, function(){
         if (chrome.runtime.error) {
         }

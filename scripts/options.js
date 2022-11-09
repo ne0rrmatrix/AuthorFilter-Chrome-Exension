@@ -22,10 +22,18 @@ document.body.onload = function()
 };
 
 
+function filter() 
+{
+    const arr = document.getElementById('blocklist');
+    arr.innerHTML ='';
+}
+
+
 function SendAuthors()
 {
   chrome.runtime.sendMessage({SendingAuthors: authors});
-    location.reload();
+    filter();
+    show();
 };
 
 function show() 

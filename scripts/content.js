@@ -23,7 +23,6 @@ const composeObserver = new MutationObserver(() =>
 });
 
 
-
 document.body.onload = function() 
 {
 	loading();

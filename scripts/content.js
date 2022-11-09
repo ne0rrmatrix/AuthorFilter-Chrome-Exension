@@ -61,7 +61,7 @@ function addObserverIfDesiredNodeAvailable() {
 function filter() 
 {
 		composeObserver.disconnect();
-		if (ischecked == 'yes')
+		if (ischecked == 'yes' || ischecked == '')
 		{
 			const arr = Array.from(document.querySelectorAll('[data-index]'))
 			for (let i = 0; i < arr.length; i++)

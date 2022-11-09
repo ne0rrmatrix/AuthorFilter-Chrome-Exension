@@ -30,7 +30,7 @@ chrome.runtime.onMessage.addListener(
         if (request.question === 'Authors') sendResponse({Sending: authors});
         if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors)};
         if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge();};
+        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge();console.log('background received ischeck: ' +ischecked)};
         if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
         if (request.question === 'url') sendResponse({SendingUrl: currrent_url});    
     });
@@ -61,6 +61,7 @@ async function getIsChecked() {
    try {
     let key3 = await readLocalStorage('ischecked');
     ischecked = key3;
+    console.log('Background retrieved ischeck: ' + ischecked);
    }
    catch {
    }
@@ -125,7 +126,7 @@ function SaveIsChecked(response)
         }
         if (!chrome.runtime.error)
         {
-            
+            console.log('Saved ischeck: ' + ischecked);        
         }
     })
 };

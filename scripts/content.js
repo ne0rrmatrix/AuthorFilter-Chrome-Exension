@@ -7,18 +7,9 @@ var sponsored = false;
 var savedCounter = 0;
 var ischecked = '';
 var clicked = false;
-var mutations = 0;
 let counter = 0;
 
-window.addEventListener('click', () => {
-	console.log('clicked!');
-//	clicked = true;
-	//mutations = 0;
-	counter = 0;
-	savedCounter = 0;
-//	composeObserver.disconnect();
-	filter();
-  });
+
 
 
 chrome.runtime.onMessage.addListener(
@@ -27,33 +18,34 @@ chrome.runtime.onMessage.addListener(
 		if (response.question == 'Counter') sendResponse({SendingCounter: counter})
 	});
 
+	
 
-chrome.runtime.sendMessage({question:"Authors"}, function(response) 
+
+function getAuthors()
 {
-	authors.length = 0;
-	//console.log(response.Sending);
-	for (const author of response.Sending) 
-		{
-			insertAuthor(author.first_name,author.last_name);
-		};
-	//mutations = 0;
-	filter();
-});
+	chrome.runtime.sendMessage({question:"Authors"}, function(response) 
+	{
+		authors.length = 0;
+		for (const author of response.Sending) 
+			{
+				insertAuthor(author.first_name,author.last_name);
+			};
+			filter();
+	});
+}
+
 
 
 const composeObserver = new MutationObserver(() => 
 {
-	//mutations += 1;
-//	console.log('Page mutation!!!' + mutations);
-	
 	filter();
 });
 
 
 document.body.onload = function() 
 {
-	console.log("page loaded!");
-	if (mutations > 0) console.log('Page mutation!!!' + mutations);
+	getIsChecked();
+	getAuthors();
 	filter()
 }
 
@@ -73,13 +65,10 @@ function addObserverIfDesiredNodeAvailable() {
 };
 
 
-//setTimeout(() => {composeObserver.disconnect();addObserverIfDesiredNodeAvailable();}, 5000);
-
-
 function filter() 
 {
 		composeObserver.disconnect();
-		if (ischecked == 'yes' || ischecked == '')
+		if (ischecked == 'yes')
 		{
 			const arr = Array.from(document.querySelectorAll('[data-index]'))
 			for (let i = 0; i < arr.length; i++)
@@ -90,17 +79,13 @@ function filter()
 						{ 
 							arr[i].innerHTML ='';
 							counter = counter + 1;
-							console.log(counter);
 								savedCounter = counter;
 						}
 					}
-			}
-		//	console.log('counter is: ' + savedCounter)
-			
+			};
+
 			SendData(savedCounter);
 			addObserverIfDesiredNodeAvailable();
-		//	console.log('observer connnected!')
-			console.log('Saved counter is: ' + savedCounter)
 		}
 };
 
@@ -129,6 +114,12 @@ function getIsChecked()
 	
 		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
 	{
-		if (response.Sendingischeck) ischecked = response.Sendingischeck; 
+		if (response.Sendingischeck) {ischecked = response.Sendingischeck;}; 
 	});
 }
+
+window.addEventListener('click', () => {
+counter = 0;
+savedCounter = 0;
+filter();
+});

@@ -68,7 +68,7 @@ async function getAuthors() {
         }
     catch {
     }
-}
+};
 
 
 async function getCounters() {
@@ -78,7 +78,7 @@ async function getCounters() {
     }
     catch {
     }
-} 
+};
 
 
 async function getIsChecked() 

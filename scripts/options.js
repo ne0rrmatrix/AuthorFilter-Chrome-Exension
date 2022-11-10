@@ -6,7 +6,7 @@ let authors = [];
 
 function insertAuthor(first,last) 
 {
-  let name = {}
+  let name = {};
   name.first_name = first;
   name.last_name = last;
   authors.push(name);
@@ -17,6 +17,7 @@ document.body.onload = async () =>
 {
  load();
 };
+
 
 const load = async () =>
 {
@@ -29,7 +30,9 @@ const load = async () =>
           console.log('error');
   }
   show();
-}
+};
+
+
 document.getElementById("reset").onclick = () => 
 {
   let authors = [];
@@ -57,10 +60,10 @@ getAuthors = () =>
             insertAuthor(author.first_name,author.last_name);
           };
         resolve();
-  })
+  });
         return;
 		});
-}
+};
 
 
 function filter() 
@@ -83,21 +86,22 @@ const SendAuthors = async (msg)  =>
       else resolve(response);
     });
     return;
-  })
+  });
 };
+
 
 async function show() 
 {
     let table = document.createElement('table');
     let tbody = document.createElement('tbody');
     let tr = document.createElement('tr');
-    let arr = ['First Name','Last Name','Del']
+    let arr = ['First Name','Last Name','Del'];
     
     for (let i = 0; i < arr.length; i++) 
     {
       let th = document.createElement('th'); 
       let text = document.createTextNode(arr[i])
-      th.appendChild(text)
+      th.appendChild(text);
       tr.appendChild(th);
       tbody.appendChild(tr);
     };
@@ -117,7 +121,7 @@ async function show()
       let last = document.getElementById('last_name').value;
       insertAuthor(first,last);
       try {
-        let msg = {SendingAuthors: authors}
+        let msg = {SendingAuthors: authors};
         try {
           let answer = await  SendAuthors(msg);
         }
@@ -157,7 +161,7 @@ async function show()
             {
               authors.splice(i,1);
               try {
-                let msg = {SendingAuthors: authors}
+                let msg = {SendingAuthors: authors};
                 let answer = await  SendAuthors(msg);
                load();
               }
@@ -170,7 +174,7 @@ async function show()
             tr = document.createElement('tr');
             let fn = document.createTextNode(authors[i].first_name);
             let ln = document.createTextNode(authors[i].last_name);
-            arr = [fn,ln,btnDel]
+            arr = [fn,ln,btnDel];
             
             for (let k = 0; k < arr.length; k++)
             {

@@ -8,7 +8,6 @@ var clicked = false;
 counter = 0;
 
 
-
 const composeObserver = new MutationObserver(() => 
 {
 	composeObserver.disconnect();
@@ -49,7 +48,6 @@ const load = async () =>
 }
 
 
-
 function addObserverIfDesiredNodeAvailable(counter) {
     var composeBox = document.querySelector('#search');
 	
@@ -85,7 +83,7 @@ filter = async (authors,ischecked,counter) =>
 			SendData(counter);
 		if (true) resolve(counter);
 		};
-	})
+	});
 		
 };
 
@@ -97,7 +95,7 @@ insertAuthor = async (response) =>
 	{
 		for (const author of response.Sending) 
 		{			
-			let name = {}
+			let name = {};
 			name.first_name = author.first_name;
 			name.last_name = author.last_name;
 			authors.push(name);
@@ -108,7 +106,7 @@ insertAuthor = async (response) =>
 			reject();
 		}
 		else resolve(authors);
-	})
+	});
 };
 
 
@@ -136,8 +134,8 @@ const getIsChecked =  async (msg) =>
 			else resolve(response);
 		});
 	return;
-	})
-}
+	});
+};
 
 
 const getAuthors = async (msg) =>
@@ -152,6 +150,6 @@ const getAuthors = async (msg) =>
       else resolve(response);
     });
     return;
-	})
+	});
 };
 

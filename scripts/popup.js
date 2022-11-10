@@ -7,15 +7,20 @@ var span = document.getElementById('btn');
 var currrent_url = '';
 
 
-document.getElementById('options').addEventListener('click', () => {
-  if (chrome.runtime.openOptionsPage) {
+document.getElementById('options').addEventListener('click', () => 
+{
+  if (chrome.runtime.openOptionsPage) 
+  {
     chrome.runtime.openOptionsPage();
-  } else {
+  } 
+  else 
+  {
     window.open(chrome.runtime.getURL('options.html'));
   };
 });
 
-span.addEventListener('click', function() 
+
+span.addEventListener('click', () => 
 {
   if (span.checked == false) 
   {
@@ -33,8 +38,7 @@ span.addEventListener('click', function()
 });
 
 
-
-document.body.onload = function() 
+document.body.onload = () => 
 {
   getCurrentUrl();
   getIsChecked();
@@ -80,6 +84,7 @@ function LoadData()
   
   document.getElementById("AuthorsBlocked").appendChild(tbody);
 }; 
+
 
 function getIsChecked()
 {

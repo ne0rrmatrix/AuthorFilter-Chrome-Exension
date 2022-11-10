@@ -27,14 +27,35 @@ getIsChecked();
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
-        if (request.Counter) {counter = request.Counter;SetBadge();}
         if (request.question === 'Authors') sendResponse({Sending: authors});
-        if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors)};
-        if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge()};
         if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
         if (request.question === 'url') sendResponse({SendingUrl: currrent_url});    
+        if (request.question === 'Counter') sendResponse({SendingCounter: counter});
+        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge()};
+        if (request.SendingAuthors) {sendResponse({answer: "confirmed!"});SaveAuthorData(request.SendingAuthors)};
+        if (request.Counter) {counter = request.Counter;SetBadge();}
     });
+
+
+chrome.tabs.onActivated.addListener(function(activeInfo) 
+{
+    chrome.tabs.get(activeInfo.tabId, function(tab)
+    {
+        currrent_url = tab.url;
+        SetBadge(counter);
+    });
+}); 
+    
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
+{
+        if (!changeInfo.url == 'undefined') 
+        {
+        currrent_url = changeInfo.url;
+        SetBadge(counter);
+    };
+});
+
 
 async function getAuthors() {
     try {
@@ -69,26 +90,6 @@ async function getIsChecked()
    catch {
    }
 };
-
-
-chrome.tabs.onActivated.addListener(function(activeInfo) 
-{
-    chrome.tabs.get(activeInfo.tabId, function(tab)
-    {
-        currrent_url = tab.url;
-        SetBadge(counter);
-    });
-}); 
-  
-
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
-{
-     if (!changeInfo.url == 'undefined') 
-     {
-        currrent_url = changeInfo.url;
-        SetBadge(counter);
-    };
- }); 
 
 
 function SetBadge()

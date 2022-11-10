@@ -4,51 +4,52 @@
 // TODO Make function async and add await.
 // TODO Clean up spacing, fix any formatting.
 
-var authors = [];
-var sponsored = false;
-var savedCounter = 0;
-var ischecked = '';
 var clicked = false;
-let counter = 0;
-
-
-chrome.runtime.onMessage.addListener(
-	(request, sender, sendResponse) => {
-		if (request.ischeckedSending) {ischecked = request.ischeckedSending;};
-		if (response.question == 'Counter') sendResponse({SendingCounter: counter});
-	});
+counter = 0;
 
 
 const composeObserver = new MutationObserver(() => 
 {
 	composeObserver.disconnect();
-	reload();
+	load();
 });
 
-async function reload()
-{
-	await filter();
-	addObserverIfDesiredNodeAvailable();
-	return;
-}
 
-document.body.onload = function() 
+document.body.onload = async () => 
 {
-	loading();
+	await load();
 };
 
 
-async function loading()
+window.addEventListener('click', async () => 
 {
-	await getAuthors();
-	await getIsChecked();
-	await filter();
-	
+	counter = 0;
+	await load();
+});
+
+
+const load = async () =>
+{
+	let ischecked = '';
+	try {
+		let msg = {question: 'Authors'};
+		let response = await getAuthors(msg);
+		let msg1 = {question: 'ischeck'};
+		answer = await getIsChecked(msg1);
+		ischecked = answer.Sendingischeck;
+		let authors = await insertAuthor(response);
+		counter = await filter(authors,ischecked,counter);
+	}
+	catch {
+			console.log('error!');
+	}
+	addObserverIfDesiredNodeAvailable(counter);
 	return;
 }
 
 
-function addObserverIfDesiredNodeAvailable() {
+
+function addObserverIfDesiredNodeAvailable(counter) {
     var composeBox = document.querySelector('#search');
 	
     if(!composeBox) 
@@ -58,12 +59,13 @@ function addObserverIfDesiredNodeAvailable() {
     };
     var config = {subtree: true, childList: true,characterData: true};
     composeObserver.observe(composeBox,config);
-	return;
+	return (counter);
 };
 
 
-async function filter() 
+filter = async (authors,ischecked) =>  
 {
+	return new Promise((resolve,reject) => {
 		composeObserver.disconnect();
 		if (ischecked == 'yes' || ischecked == '')
 		{
@@ -76,23 +78,36 @@ async function filter()
 						{ 
 							arr[i].innerHTML ='';
 							counter = counter + 1;
-								savedCounter = counter;
 						};
 					};
 			};
-			SendData(savedCounter);
+			SendData(counter);
+		if (true) resolve(counter);
 		};
-		addObserverIfDesiredNodeAvailable();
-		return;
+	})
+		
 };
 
 
-function insertAuthor(first,last) 
+insertAuthor = async (response) => 
 {
-	let name = {}
-	name.first_name = first;
-	name.last_name = last;
-	authors.push(name);
+	let authors = [];
+	return new Promise((resolve,reject) =>
+	{
+		for (const author of response.Sending) 
+		{			
+			let name = {}
+			name.first_name = author.first_name;
+			name.last_name = author.last_name;
+			authors.push(name);
+		};
+		if (typeof response.Sending == 'undefined') 
+		{
+			console.log("Error receiving author data! ");
+			reject();
+		}
+		else resolve(authors);
+	})
 };
 
 
@@ -106,32 +121,36 @@ function SendData(counter)
 };
 
 
-async function getIsChecked()
+const getIsChecked =  async (msg) =>
 {
-		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
+	return new Promise((resolve,reject) =>
 	{
-		if (response.Sendingischeck) {ischecked = response.Sendingischeck;}; 
-	});
-	return;
-};
-
-
-async function getAuthors()
-{
-	chrome.runtime.sendMessage({question:"Authors"}, function(response) 
-	{
-		authors.length = 0;
-		for (const author of response.Sending) 
+		chrome.runtime.sendMessage(msg, function(response) 
+		{
+			if (typeof response.Sendingischeck == 'undefined') 
 			{
-				insertAuthor(author.first_name,author.last_name);
-			};
-	});
+				console.log('error getting ischeck');
+				reject();
+			}
+			else resolve(response);
+		});
 	return;
+	})
+}
+
+
+const getAuthors = async (msg) =>
+{
+	return new Promise((resolve,reject) => {
+		chrome.runtime.sendMessage(msg, function(response)
+    {
+      if (typeof response.Sending == 'undefined')
+      {
+        reject();
+      }
+      else resolve(response);
+    });
+    return;
+	})
 };
 
-
-window.addEventListener('click', () => {
-counter = 0;
-savedCounter = 0;
-filter();
-});

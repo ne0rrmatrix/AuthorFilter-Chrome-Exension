@@ -13,7 +13,23 @@ function insertAuthor(first,last)
 };
 
 
-document.body.onload = function() 
+document.body.onload = async () =>
+{
+ 
+  await getAuthors();
+  
+};
+
+
+document.getElementById("reset").onclick = () => 
+{
+  authors.length = 0;
+  SendAuthors();
+  show();
+};
+
+
+async function getAuthors()
 {
   authors.length = 0;
   chrome.runtime.sendMessage({question: "Authors"}, function(response) 
@@ -22,28 +38,37 @@ document.body.onload = function()
         {
           insertAuthor(author.first_name,author.last_name);
         };
-        if (typeof authors != 'undefined')show();
+        show()
+        return;
 		});
-    if (typeof authors == 'undefined')show();
-};
+
+}
 
 
 function filter() 
 {
-    const arr = document.getElementById('blocklist');
+  
+  const arr = document.querySelector('div');
     arr.innerHTML ='';
 };
 
 
-function SendAuthors()
+const SendAuthors = async (msg)  => 
 {
-  chrome.runtime.sendMessage({SendingAuthors: authors});
-    filter();
-    show();
+  return new Promise((resolve,reject) => {
+    chrome.runtime.sendMessage(msg, function(response)
+    {
+      if (typeof response.answer == 'undefined')
+      {
+        reject();
+      }
+      else resolve(response);
+    });
+    return;
+  })
 };
 
-
-function show() 
+async function show() 
 {
     let table = document.createElement('table');
     let tbody = document.createElement('tbody');
@@ -68,12 +93,23 @@ function show()
     btnAdd.id = "Add";
     btnAdd.className = "button";
 
-    btnAdd.addEventListener('click', () => 
+    btnAdd.addEventListener('click', async () => 
     {
       let first = document.getElementById('first_name').value;
       let last = document.getElementById('last_name').value;
       insertAuthor(first,last);
-      SendAuthors();
+      try {
+        let msg = {SendingAuthors: authors}
+        let answer = await  SendAuthors(msg);
+        console.log(answer.answer);
+        filter();
+        show();
+      }
+      catch {
+            console.log('Send authors failed from options.js!');
+      }
+      
+    //  SendAuthors();
      
     });
 
@@ -99,10 +135,20 @@ function show()
             btnDel.id = "Del";
             btnDel.className = "button button3";
             
-            btnDel.addEventListener('click', () => 
+            btnDel.addEventListener('click', async () => 
             {
               authors.splice(i,1);
-              SendAuthors();
+              try {
+                let msg = {SendingAuthors: authors}
+                let answer = await  SendAuthors(msg);
+                console.log(answer.answer);
+                filter();
+                show();
+              }
+              catch {
+                    console.log('Send authors failed from options.js!');
+              }
+              
             });
 
             tr = document.createElement('tr');
@@ -122,12 +168,6 @@ function show()
 
     table.appendChild(tbody);
     document.getElementById("blocklist").appendChild(table);
+    return;
 };
 
-
-document.getElementById("reset").onclick =function() 
-{
-  authors.length = 0;
-  SendAuthors();
-  location.reload();
-};

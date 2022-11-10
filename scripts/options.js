@@ -16,7 +16,6 @@ function insertAuthor(first,last)
 document.body.onload = async () =>
 {
  load();
-  
 };
 
 const load = async () =>
@@ -24,18 +23,24 @@ const load = async () =>
   try {
         filter();
         await getAuthors();
-        show();
+        console.log('Failed to get authors!');
   }
   catch {
           console.log('error');
   }
+  show();
 }
 document.getElementById("reset").onclick = () => 
 {
   let authors = [];
   authors.length = 0;
   let msg = {SendingAuthors: authors}
-  let response =  SendAuthors(msg);
+  try {
+    let response =  SendAuthors(msg);
+  }
+  catch {
+          console.log('Sending authors failed!');
+  }
   load();
 };
 
@@ -55,7 +60,6 @@ getAuthors = () =>
   })
         return;
 		});
-
 }
 
 
@@ -114,10 +118,13 @@ async function show()
       insertAuthor(first,last);
       try {
         let msg = {SendingAuthors: authors}
-        let answer = await  SendAuthors(msg);
-        console.log(answer.answer);
-        filter();
-        show();
+        try {
+          let answer = await  SendAuthors(msg);
+        }
+        catch {
+                console.log('Failed to send authors!');
+        }
+       load();
       }
       catch {
             console.log('Send authors failed from options.js!');
@@ -152,9 +159,7 @@ async function show()
               try {
                 let msg = {SendingAuthors: authors}
                 let answer = await  SendAuthors(msg);
-                console.log(answer.answer);
-                filter();
-                show();
+               load();
               }
               catch {
                     console.log('Send authors failed from options.js!');

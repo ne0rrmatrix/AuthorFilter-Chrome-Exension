@@ -15,30 +15,44 @@ function insertAuthor(first,last)
 
 document.body.onload = async () =>
 {
- 
-  await getAuthors();
+ load();
   
 };
 
-
+const load = async () =>
+{
+  try {
+        filter();
+        await getAuthors();
+        show();
+  }
+  catch {
+          console.log('error');
+  }
+}
 document.getElementById("reset").onclick = () => 
 {
+  let authors = [];
   authors.length = 0;
-  SendAuthors();
-  show();
+  let msg = {SendingAuthors: authors}
+  let response =  SendAuthors(msg);
+  load();
 };
 
 
-async function getAuthors()
+getAuthors = () =>
 {
-  authors.length = 0;
-  chrome.runtime.sendMessage({question: "Authors"}, function(response) 
-		{
-			for (const author of response.Sending) 
-        {
-          insertAuthor(author.first_name,author.last_name);
-        };
-        show()
+  return new Promise((resolve, reject) => {
+    authors.length = 0;
+    chrome.runtime.sendMessage({question: "Authors"}, function(response) 
+      {
+        if (typeof response.Sending == 'undefined') {reject()}
+        for (const author of response.Sending) 
+          {
+            insertAuthor(author.first_name,author.last_name);
+          };
+        resolve();
+  })
         return;
 		});
 
@@ -108,9 +122,6 @@ async function show()
       catch {
             console.log('Send authors failed from options.js!');
       }
-      
-    //  SendAuthors();
-     
     });
 
     arr = [fn,ln,btnAdd];

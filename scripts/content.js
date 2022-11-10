@@ -8,6 +8,7 @@ var clicked = false;
 counter = 0;
 
 
+
 const composeObserver = new MutationObserver(() => 
 {
 	composeObserver.disconnect();
@@ -23,7 +24,6 @@ document.body.onload = async () =>
 
 window.addEventListener('click', async () => 
 {
-	counter = 0;
 	await load();
 });
 
@@ -63,7 +63,7 @@ function addObserverIfDesiredNodeAvailable(counter) {
 };
 
 
-filter = async (authors,ischecked) =>  
+filter = async (authors,ischecked,counter) =>  
 {
 	return new Promise((resolve,reject) => {
 		composeObserver.disconnect();
@@ -110,6 +110,15 @@ insertAuthor = async (response) =>
 	})
 };
 
+/*
+function insertAuthor(first,last) 
+{
+	let name = {}
+	name.first_name = first;
+	name.last_name = last;
+	authors.push(name);
+};
+*/
 
 function SendData(counter)
 {

@@ -55,7 +55,7 @@ const load = async () =>
 };
 
 
-const getAuthors = () =>
+const getAuthors = async () =>
 {
   return new Promise((resolve, reject) => {
     authors.length = 0;

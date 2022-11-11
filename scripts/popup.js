@@ -90,9 +90,7 @@ function getIsChecked()
 {
 		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
 	{
-		
     if (response.Sendingischeck== 'yes' || response.Sendingischecked == ''){span.checked = true;}
-   // else if (response.Sendingischeck == 'no'){ span.checked = false; isChecked = 'no'}
    else {span.checked =false;isChecked = 'no'}
 	});
 }
@@ -105,7 +103,6 @@ function getCurrentUrl()
     if (response.SendingUrl){
       currrent_url = response.SendingUrl;
     }
-    
   })
 };
 

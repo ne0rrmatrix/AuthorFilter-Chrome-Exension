@@ -30,15 +30,14 @@ window.addEventListener('click', async () =>
 
 let load = async () =>
 {
-	let ischecked = '';
 	try {
 		await getAuthors({question: 'Authors'}).then((response) =>
 		{
 			let answer = insertAuthor(response)
 			answer.then((authors) => {
 				let response = getIsChecked({question: 'ischeck'})
-				response.then(() => {
-					counter = filter(authors,ischecked,counter);
+				response.then((ischecked) => {
+					counter = filter(authors,ischecked.Sendingischeck,counter);
 				})
 			})
 		})
@@ -71,6 +70,7 @@ const filter = async (authors,ischecked,counter) =>
 		{
 			reject();
 		}
+		else{
 			const arr = Array.from(document.querySelectorAll('[data-index]'))
 			for (const element of arr)
 			{
@@ -83,8 +83,9 @@ const filter = async (authors,ischecked,counter) =>
 						}
 					}
 			}
-			SendData(counter);
-			resolve(counter);
+		}
+		SendData(counter);
+		resolve(counter);
 		})
 }
 

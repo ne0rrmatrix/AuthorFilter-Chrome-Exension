@@ -1,6 +1,3 @@
-// TODO Make function async and add await.
-// TODO Fix any spacing and formatting.
-
 const span = document.getElementById('btn');
 
 

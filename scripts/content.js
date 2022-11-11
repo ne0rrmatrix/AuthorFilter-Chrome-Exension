@@ -4,91 +4,92 @@
 // TODO Make function async and add await.
 // TODO Clean up spacing, fix any formatting.
 
-var clicked = false;
-counter = 0;
+
+let counter = 0;
 
 
 const composeObserver = new MutationObserver(() => 
 {
 	composeObserver.disconnect();
 	load();
-});
+})
 
 
 document.body.onload = async () => 
 {
 	await load();
-};
+}
 
 
 window.addEventListener('click', async () => 
 {
 	counter = 0;
 	await load();
-});
+})
 
 
-const load = async () =>
+let load = async () =>
 {
 	let ischecked = '';
 	try {
-		let msg = {question: 'Authors'};
-		let response = await getAuthors(msg);
-		let msg1 = {question: 'ischeck'};
-		answer = await getIsChecked(msg1);
-		ischecked = answer.Sendingischeck;
-		let authors = await insertAuthor(response);
-		counter = await filter(authors,ischecked,counter);
+		await getAuthors({question: 'Authors'}).then((response) =>
+		{
+			let answer = insertAuthor(response)
+			answer.then((authors) => {
+				let response = getIsChecked({question: 'ischeck'})
+				response.then(() => {
+					counter = filter(authors,ischecked,counter);
+				})
+			})
+		})
 	}
 	catch {
 			console.log('error!');
 	}
-	addObserverIfDesiredNodeAvailable(counter);
-	return;
+	addObserverIfDesiredNodeAvailable();
 }
 
 
-function addObserverIfDesiredNodeAvailable(counter) {
-    var composeBox = document.querySelector('#search');
+function addObserverIfDesiredNodeAvailable() {
+    let composeBox = document.querySelector('#search');
 	
     if(!composeBox) 
 	{
         window.setTimeout(addObserverIfDesiredNodeAvailable,500);
         return;
     };
-    var config = {subtree: true, childList: true,characterData: true};
+    let config = {subtree: true, childList: true,characterData: true};
     composeObserver.observe(composeBox,config);
-	return (counter);
-};
+}
 
 
-filter = async (authors,ischecked,counter) =>  
+const filter = async (authors,ischecked,counter) =>  
 {
 	return new Promise((resolve,reject) => {
 		composeObserver.disconnect();
-		if (ischecked == 'yes' || ischecked == '')
+		if (ischecked == 'no')
 		{
+			reject();
+		}
 			const arr = Array.from(document.querySelectorAll('[data-index]'))
-			for (let i = 0; i < arr.length; i++)
+			for (const element of arr)
 			{
-					for (author of authors)
+					for (const author of authors)
 					{
-						if (arr[i].textContent.includes(author.first_name) && arr[i].textContent.includes(author.last_name)) 
+						if (element.textContent.includes(author.first_name) && element.textContent.includes(author.last_name)) 
 						{ 
-							arr[i].innerHTML ='';
+							element.innerHTML ='';
 							counter = counter + 1;
-						};
-					};
-			};
+						}
+					}
+			}
 			SendData(counter);
-		if (true) resolve(counter);
-		};
-	});
-		
-};
+			resolve(counter);
+		})
+}
 
 
-insertAuthor = async (response) => 
+let insertAuthor = async (response) => 
 {
 	let authors = [];
 	return new Promise((resolve,reject) =>
@@ -99,25 +100,24 @@ insertAuthor = async (response) =>
 			name.first_name = author.first_name;
 			name.last_name = author.last_name;
 			authors.push(name);
-		};
+		}
 		if (typeof response.Sending == 'undefined') 
 		{
 			console.log("Error receiving author data! ");
 			reject();
 		}
 		else resolve(authors);
-	});
-};
+	})
+}
 
 
-function SendData(counter)
+const SendData = (counter) =>
 {
 	if (counter > 0)
 	{
-		savedCounter = counter;
 		chrome.runtime.sendMessage({Counter: counter})
-	};
-};
+	}
+}
 
 
 const getIsChecked =  async (msg) =>
@@ -132,10 +132,9 @@ const getIsChecked =  async (msg) =>
 				reject();
 			}
 			else resolve(response);
-		});
-	return;
-	});
-};
+		})
+	})
+}
 
 
 const getAuthors = async (msg) =>
@@ -148,8 +147,7 @@ const getAuthors = async (msg) =>
         reject();
       }
       else resolve(response);
-    });
-    return;
-	});
-};
+    })
+	})
+}
 

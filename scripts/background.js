@@ -1,11 +1,11 @@
 //TODO Make functions async and add await.
 //TODO Fix spacing and formatting.
 
-var authors = [];
-var sponsored = false;
-var counter = 0;
-var currrent_url = '';
-var ischecked = '';
+let authors = [];
+let sponsored = false;
+let counter = 0;
+let currrent_url = '';
+let ischecked = '';
 
 const readLocalStorage = async (key) => {
     return new Promise((resolve, reject) => {
@@ -42,7 +42,7 @@ chrome.tabs.onActivated.addListener(function(activeInfo)
     chrome.tabs.get(activeInfo.tabId, function(tab)
     {
         currrent_url = tab.url;
-        SetBadge(counter);
+        SetBadge();
     });
 }); 
     
@@ -52,8 +52,8 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
         if (!changeInfo.url == 'undefined') 
         {
         currrent_url = changeInfo.url;
-        SetBadge(counter);
-    };
+        SetBadge();
+    }
 });
 
 
@@ -68,7 +68,7 @@ async function getAuthors() {
         }
     catch {
     }
-};
+}
 
 
 async function getCounters() {
@@ -78,7 +78,7 @@ async function getCounters() {
     }
     catch {
     }
-};
+}
 
 
 async function getIsChecked() 
@@ -89,7 +89,7 @@ async function getIsChecked()
    }
    catch {
    }
-};
+}
 
 
 function SetBadge()
@@ -101,13 +101,10 @@ function SetBadge()
     }
     else
     {
-        if (ischecked == 'yes' || ischecked == '')
-        {
             chrome.action.setBadgeText({text: counter.toString()});
             chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
-        } 
-    };
-}; 
+    }
+}
 
 
 function insertAuthor(first,last) 
@@ -116,7 +113,7 @@ function insertAuthor(first,last)
     name.first_name = first;
     name.last_name = last;
     authors.push(name);
-};
+}
 
 
 function SaveIsChecked(response)
@@ -124,14 +121,8 @@ function SaveIsChecked(response)
     ischecked = response;
     
     chrome.storage.sync.set({'ischecked': response}, function(){
-        if (chrome.runtime.error) 
-        {
-        };
-        if (!chrome.runtime.error)
-        {      
-        };
     });
-};
+}
 
 
 function SendingCounters()
@@ -139,8 +130,8 @@ function SendingCounters()
     if (currrent_url.includes('amazon'))
     {
         chrome.runtime.sendMessage({sendingCounters: counter})
-    };
-};
+    }
+}
 
 
 function SaveAuthorData(response)
@@ -151,28 +142,17 @@ function SaveAuthorData(response)
     };
     chrome.storage.sync.set({'authors': authors}, function() 
     {
-        if (chrome.runtime.error) 
-        {
-        };
-        if (!chrome.runtime.error)
-        {
-        };
     });
-};
+}
 
 
 function SaveCounter(response)
 {
     chrome.storage.sync.set({'counter': response}, function()
     {
-        if (chrome.runtime.error)
-        {
-        };
-        if (!chrome.runtime.error)
-        {
-        };
+       
     })
-};
+}
 
 
 

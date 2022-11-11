@@ -1,10 +1,10 @@
 // TODO Make function async and add await.
 // TODO Fix any spacing and formatting.
 
-var counter = 0;
-var isChecked = '';
-var span = document.getElementById('btn');
-var currrent_url = '';
+let counter = 0;
+let isChecked = '';
+const span = document.getElementById('btn');
+let currrent_url = '';
 
 
 document.getElementById('options').addEventListener('click', () => 
@@ -92,17 +92,20 @@ function getIsChecked()
 	{
 		
     if (response.Sendingischeck== 'yes' || response.Sendingischecked == ''){span.checked = true;}
-    else if (response.Sendingischeck == 'no'){ span.checked = false; isChecked = 'no'};
+   // else if (response.Sendingischeck == 'no'){ span.checked = false; isChecked = 'no'}
+   else {span.checked =false;isChecked = 'no'}
 	});
-};
+}
 
 
 function getCurrentUrl()
 {
   chrome.runtime.sendMessage({question: "url"},function(response)
   {
-    if (response.SendingUrl)
-    currrent_url = response.SendingUrl;
+    if (response.SendingUrl){
+      currrent_url = response.SendingUrl;
+    }
+    
   })
 };
 
@@ -110,4 +113,4 @@ function getCurrentUrl()
 function SendStatus(status)
 {
   chrome.runtime.sendMessage({SendingIsChecked: status});
-};
+}

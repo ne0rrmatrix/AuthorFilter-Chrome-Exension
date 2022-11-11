@@ -67,7 +67,6 @@ const filter = async (authors,ischecked) =>
 {
 	return new Promise((resolve,reject) => {
 		composeObserver.disconnect();
-		console.log(ischecked)
 		if (ischecked == 'no')
 		{
 			reject();

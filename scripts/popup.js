@@ -22,17 +22,18 @@ document.getElementById('options').addEventListener('click', () =>
 
 span.addEventListener('click', () => 
 {
-  if (span.checked == false) 
-  {
-    isChecked = 'no';
-  counter = 0;
-  SendStatus('no');
-  LoadData();
-  } else 
+  if (span.checked) 
   {
     isChecked = 'yes';
     SendStatus('yes');
     getCurrentUrl();
+    LoadData();
+    
+  } else 
+  {
+    isChecked = 'no';
+    counter = 0;
+    SendStatus('no');
     LoadData();
   };
 });

@@ -24,6 +24,7 @@ document.body.onload = async () =>
 window.addEventListener('click', async () => 
 {
 	counter = 0;
+	composeObserver.disconnect();
 	await load();
 })
 
@@ -35,17 +36,17 @@ let load = async () =>
 		{
 			let answer = insertAuthor(response)
 			answer.then((authors) => {
-				let response = getIsChecked({question: 'ischeck'})
-				response.then((ischecked) => {
-					counter = filter(authors,ischecked.Sendingischeck,counter);
+				let ischecked = getIsChecked({question: 'ischeck'})
+				ischecked.then((response) => {
+					filter(authors,response.Sendingischeck);
+				})
+					
 				})
 			})
-		})
 	}
 	catch {
 			console.log('error!');
 	}
-	addObserverIfDesiredNodeAvailable();
 }
 
 
@@ -62,10 +63,11 @@ function addObserverIfDesiredNodeAvailable() {
 }
 
 
-const filter = async (authors,ischecked,counter) =>  
+const filter = async (authors,ischecked) =>  
 {
 	return new Promise((resolve,reject) => {
 		composeObserver.disconnect();
+		console.log(ischecked)
 		if (ischecked == 'no')
 		{
 			reject();
@@ -85,7 +87,8 @@ const filter = async (authors,ischecked,counter) =>
 			}
 		}
 		SendData(counter);
-		resolve(counter);
+		addObserverIfDesiredNodeAvailable();
+		resolve();
 		})
 }
 

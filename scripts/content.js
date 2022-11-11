@@ -132,7 +132,6 @@ const getIsChecked =  async (msg) =>
 		{
 			if (typeof response.Sendingischeck == 'undefined') 
 			{
-				console.log('error getting ischeck');
 				reject();
 			}
 			else resolve(response);
@@ -145,13 +144,16 @@ const getAuthors = async (msg) =>
 {
 	return new Promise((resolve,reject) => {
 		chrome.runtime.sendMessage(msg, function(response)
-    {
-      if (typeof response.Sending == 'undefined')
-      {
-        reject();
-      }
-      else resolve(response);
-    })
+		{
+			if (typeof response.Sending == 'undefined')
+			{
+				reject();
+			}
+			else 
+			{
+				resolve(response)
+			}
+		})
 	})
 }
 

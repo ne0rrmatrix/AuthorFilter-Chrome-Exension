@@ -1,10 +1,7 @@
 // TODO Make function async and add await.
 // TODO Fix any spacing and formatting.
 
-let counter = 0;
-let isChecked = '';
 const span = document.getElementById('btn');
-let currrent_url = '';
 
 
 document.getElementById('options').addEventListener('click', () => 
@@ -24,54 +21,56 @@ span.addEventListener('click', () =>
 {
   if (span.checked) 
   {
-    isChecked = 'yes';
     SendStatus('yes');
-    getCurrentUrl();
-    LoadData();
+    load();
     
   } else 
   {
-    isChecked = 'no';
-    counter = 0;
     SendStatus('no');
-    LoadData();
+    load();
   };
 });
 
 
-document.body.onload = () => 
+document.body.onload = async () => 
 {
-  getCurrentUrl();
-  getIsChecked();
-  getCounters();
-  LoadData();
+  load();
 };
 
-
-function getCounters()
+load = async () =>
 {
-  chrome.runtime.sendMessage({question: 'Counter'}, function(response) 
-  {
-     counter = response.SendingCounter;
-    LoadData();
-  });
-};
+  try {
+    await getIsChecked({question: 'ischeck'}).then((response) => {
+      getCurrentUrl({question: 'url'}).then((currrent_url) => {
+        getCounters({question: 'Counter'}).then((counter) => {
+          if (response.Sendingischeck == 'yes') span.checked = true
+          else span.checked = false
+          LoadData(response.Sendingischeck,counter.SendingCounter,currrent_url.SendingUrl)
+        })
+      })
+    }) 
+  }
+  catch {
+          console.log('error!');
+  }
+}
 
 
-function filter() 
+
+
+let filter = async () => 
 {
     const arr = document.querySelector('div');
     arr.innerHTML ='';
 };
 
 
-function LoadData()
+let LoadData = async (isChecked,counter,currrent_url) =>
 {
   filter();
   let temp = 0;
   if (currrent_url.includes('amazon')) {temp = counter;};
-  if (isChecked == 'yes' && currrent_url.includes('amazon')) {temp = counter};
-  if (isChecked == 'no') temp = 0;
+  if (isChecked == 'yes' && currrent_url.includes('amazon')) temp = counter
   let h2 = document.createElement('h2');
   let tbody = document.createElement('tbody');
   let text = document.createTextNode('Authors Blocked');
@@ -87,28 +86,44 @@ function LoadData()
 }; 
 
 
-function getIsChecked()
+let getCounters = async (msg) =>
 {
-		chrome.runtime.sendMessage({question:"ischeck"}, function(response) 
-	{
-    if (response.Sendingischeck== 'yes' || response.Sendingischecked == ''){span.checked = true;}
-   else {span.checked =false;isChecked = 'no'}
-	});
-}
-
-
-function getCurrentUrl()
-{
-  chrome.runtime.sendMessage({question: "url"},function(response)
-  {
-    if (response.SendingUrl){
-      currrent_url = response.SendingUrl;
-    }
+  return new Promise((resolve,reject) => {
+    chrome.runtime.sendMessage(msg, function(response) 
+    {
+      if (typeof response.SendingCounter == 'undefined') reject()
+      else resolve(response)
+    });
   })
 };
 
+let getIsChecked = async (msg) =>
+{
+  return new Promise((resolve,reject) => {
+    chrome.runtime.sendMessage(msg, function(response) 
+    {
+      if (typeof response.Sendingischeck == 'undefined') reject()
+     else resolve(response);
+    });
+  })
+}
 
-function SendStatus(status)
+
+let getCurrentUrl = async (msg) =>
+{
+  return new Promise((resolve,reject) => {
+    chrome.runtime.sendMessage(msg,function(response)
+    {
+      if (typeof response.SendingUrl == 'undefined') reject()
+      else resolve(response);
+    })
+
+  })
+  
+};
+
+
+let SendStatus = (status) =>
 {
   chrome.runtime.sendMessage({SendingIsChecked: status});
 }

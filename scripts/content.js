@@ -57,7 +57,7 @@ function addObserverIfDesiredNodeAvailable() {
 	{
         window.setTimeout(addObserverIfDesiredNodeAvailable,500);
         return;
-    };
+    }
     let config = {subtree: true, childList: true,characterData: true};
     composeObserver.observe(composeBox,config);
 }
@@ -76,14 +76,14 @@ const filter = async (authors,ischecked) =>
 			const arr = Array.from(document.querySelectorAll('[data-index]'))
 			for (const element of arr)
 			{
-					for (const author of authors)
-					{
-						if (element.textContent.includes(author.first_name) && element.textContent.includes(author.last_name)) 
-						{ 
-							element.innerHTML ='';
-							counter = counter + 1;
-						}
+				for (const author of authors)
+				{
+					if (element.textContent.includes(author.first_name) && element.textContent.includes(author.last_name)) 
+					{ 
+						element.innerHTML ='';
+						counter = counter + 1;
 					}
+				}
 			}
 		}
 		SendData(counter);

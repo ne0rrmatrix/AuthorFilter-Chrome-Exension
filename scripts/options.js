@@ -1,4 +1,3 @@
-//TODO Make function async and add await
 //TODO Fix any formatting, spacing, and make sure function are on bottom.
 
 

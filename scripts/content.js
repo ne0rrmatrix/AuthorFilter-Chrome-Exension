@@ -1,7 +1,4 @@
-// TODO Clean up variable so that I only use one counter!!!
-// TODO Clean up console logs.
 // TODO test test test!!!!
-// TODO Make function async and add await.
 // TODO Clean up spacing, fix any formatting.
 
 
@@ -39,10 +36,11 @@ const load = async () =>
 				let ischecked = getIsChecked({question: 'ischeck'})
 				ischecked.then((response) => {
 					filter(authors,response.Sendingischeck);
-				})
-					
+					SendData({Counter: counter});
+					addObserverIfDesiredNodeAvailable();
 				})
 			})
+		})
 	}
 	catch {
 			console.log('error!');
@@ -50,7 +48,8 @@ const load = async () =>
 }
 
 
-function addObserverIfDesiredNodeAvailable() {
+const addObserverIfDesiredNodeAvailable = () => 
+{
     let composeBox = document.querySelector('#search');
 	
     if(!composeBox) 
@@ -64,95 +63,77 @@ function addObserverIfDesiredNodeAvailable() {
 
 
 const filter = async (authors,ischecked) =>  
+new Promise((resolve, reject) => 
 {
-	return new Promise((resolve,reject) => {
-		composeObserver.disconnect();
-		if (ischecked == 'no')
-		{
-			reject();
-		}
-		else{
-			const arr = Array.from(document.querySelectorAll('[data-index]'))
-			for (const element of arr)
-			{
-				for (const author of authors)
-				{
-					if (element.textContent.includes(author.first_name) && element.textContent.includes(author.last_name)) 
-					{ 
-						element.innerHTML ='';
-						counter = counter + 1;
-					}
-				}
+	if (ischecked == 'no') {
+		reject();
+	}
+	composeObserver.disconnect();
+	const arr = Array.from(document.querySelectorAll('[data-index]'));
+	for (const element of arr) {
+		for (const author of authors) {
+			if (element.textContent.includes(author.first_name) && element.textContent.includes(author.last_name)) {
+				element.innerHTML = '';
+				counter = counter + 1;
 			}
 		}
-		SendData(counter);
-		addObserverIfDesiredNodeAvailable();
-		resolve();
-		})
-}
+	}
+	resolve();
+})
 
 
 const insertAuthor = async (response) => 
-{
-	let authors = [];
-	return new Promise((resolve,reject) =>
-	{
-		for (const author of response.Sending) 
-		{			
-			let name = {};
-			name.first_name = author.first_name;
-			name.last_name = author.last_name;
-			authors.push(name);
-		}
-		if (typeof response.Sending == 'undefined') 
-		{
-			console.log("Error receiving author data! ");
-			reject();
-		}
-		else resolve(authors);
-	})
-}
-
-
-const SendData = (counter) =>
-{
-	if (counter > 0)
-	{
-		chrome.runtime.sendMessage({Counter: counter})
+new Promise((resolve, reject) => {
+	if (typeof response.Sending == 'undefined') {
+		reject();
 	}
-}
+	let authors = [];
+	for (const author of response.Sending) {
+		let name = {};
+		name.first_name = author.first_name;
+		name.last_name = author.last_name;
+		authors.push(name);
+	}
+	resolve(authors);
+})
+
+
+const SendData = async (msg) =>
+new Promise((resolve, reject) => {
+	{
+		chrome.runtime.sendMessage(msg, function (response) {
+			if (response.answer != "confirmed!") {
+				reject();
+			}
+			else
+				resolve();
+		});
+	}
+})
 
 
 const getIsChecked =  async (msg) =>
-{
-	return new Promise((resolve,reject) =>
-	{
-		chrome.runtime.sendMessage(msg, function(response) 
-		{
-			if (typeof response.Sendingischeck == 'undefined') 
-			{
-				reject();
-			}
-			else resolve(response);
-		})
-	})
-}
+new Promise((resolve, reject) => {
+	chrome.runtime.sendMessage(msg, function (response) {
+		if (typeof response.Sendingischeck == 'undefined') {
+			reject();
+		}
+		else
+			resolve(response);
+	});
+})
 
 
 const getAuthors = async (msg) =>
-{
-	return new Promise((resolve,reject) => {
-		chrome.runtime.sendMessage(msg, function(response)
-		{
-			if (typeof response.Sending == 'undefined')
-			{
-				reject();
-			}
-			else 
-			{
-				resolve(response)
-			}
-		})
-	})
-}
+new Promise((resolve, reject) => {
+	chrome.runtime.sendMessage(msg, function (response) {
+		if (typeof response.Sending == 'undefined') {
+			reject();
+		}
+
+		else {
+			resolve(response);
+		}
+	});
+})
 

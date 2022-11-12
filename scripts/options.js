@@ -2,18 +2,10 @@
 //TODO Fix any formatting, spacing, and make sure function are on bottom.
 
 let authors = [];
-let btnAdd = document.createElement('button');
 
 
-btnAdd.addEventListener('click', async () => 
-{
-  let first = document.getElementById('first_name').value;
-  let last = document.getElementById('last_name').value;
-  insertAuthor(first,last);
-  let msg = {SendingAuthors: authors};
-  await  SendAuthors(msg);
-  load();
-});
+
+
 
 
 document.getElementById("reset").onclick = () => 
@@ -117,11 +109,21 @@ const createTableElements = async () =>
   fn.id = "first_name";
   let ln = document.createElement("input");
   ln.id = "last_name";
- 
+  
+  let btnAdd = document.createElement('button');
   btnAdd.innerText = "Add";
   btnAdd.id = "Add";
   btnAdd.className = "button";
 
+  btnAdd.addEventListener('click', async () => 
+  {
+    let first = document.getElementById('first_name').value;
+    let last = document.getElementById('last_name').value;
+    insertAuthor(first,last);
+    let msg = {SendingAuthors: authors};
+    await  SendAuthors(msg);
+    load();
+  });
   arr = [fn,ln,btnAdd];
 
   tr = document.createElement('tr');

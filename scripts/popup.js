@@ -32,6 +32,7 @@ const load = async () => {
     console.log("error!");
   }
 };
+
 const loadCounter = async (ischecked, currrent_url) => {
   try {
     await getCounters({ question: "Counter" }).then((counter) => {
@@ -39,10 +40,12 @@ const loadCounter = async (ischecked, currrent_url) => {
     });
   } catch {}
 };
+
 const filter = async () => {
   const arr = document.querySelector("div");
   arr.innerHTML = "";
 };
+
 const setIschecked = (ischecked, currrent_url, counter) => {
   if (ischecked.Sendingischeck == "yes") {
     span.checked = true;
@@ -55,6 +58,7 @@ const setIschecked = (ischecked, currrent_url, counter) => {
     currrent_url.SendingUrl
   );
 };
+
 const createTable = async (isChecked, counter, currrent_url) => {
   filter();
   let temp = 0;

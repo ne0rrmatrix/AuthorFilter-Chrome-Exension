@@ -19,11 +19,6 @@ const readLocalStorage = async (key) => {
     });
     };
 
-
-getAuthors();
-getIsChecked();
-
-
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
@@ -57,7 +52,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
 });
 
 
-async function getAuthors() {
+const getAuthors = async () => {
     try {
         let key1 = await readLocalStorage('authors');
         authors.length = 0;
@@ -71,7 +66,7 @@ async function getAuthors() {
 }
 
 
-async function getCounters() {
+const getCounters = async () => {
     try {
         let key2 = await readLocalStorage('counter');
         counter = key2;
@@ -81,7 +76,7 @@ async function getCounters() {
 }
 
 
-async function getIsChecked() 
+const getIsChecked = async () => 
 {
    try {
     let key3 = await readLocalStorage('ischecked');
@@ -92,7 +87,7 @@ async function getIsChecked()
 }
 
 
-function SetBadge()
+const SetBadge = () =>
 {
     if (!currrent_url.includes('amazon') || ischecked == 'no')
     {
@@ -107,7 +102,7 @@ function SetBadge()
 }
 
 
-function insertAuthor(first,last) 
+const insertAuthor = (first,last) => 
 {
     let name = {}
     name.first_name = first;
@@ -116,7 +111,7 @@ function insertAuthor(first,last)
 }
 
 
-function SaveIsChecked(response)
+const SaveIsChecked = (response) =>
 {
     ischecked = response;
     
@@ -125,7 +120,7 @@ function SaveIsChecked(response)
 }
 
 
-function SendingCounters()
+const SendingCounters = () =>
 {
     if (currrent_url.includes('amazon'))
     {
@@ -134,7 +129,7 @@ function SendingCounters()
 }
 
 
-function SaveAuthorData(response)
+const SaveAuthorData = (response) =>
 {
     authors.length = 0;
     for (const author of response){
@@ -146,7 +141,7 @@ function SaveAuthorData(response)
 }
 
 
-function SaveCounter(response)
+const SaveCounter = (response) =>
 {
     chrome.storage.sync.set({'counter': response}, function()
     {
@@ -154,5 +149,6 @@ function SaveCounter(response)
     })
 }
 
-
+getAuthors();
+getIsChecked();
 

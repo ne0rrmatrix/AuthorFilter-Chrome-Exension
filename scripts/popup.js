@@ -1,6 +1,3 @@
-const span = document.getElementById('btn');
-
-
 document.getElementById('options').addEventListener('click', () => 
 {
   if (chrome.runtime.openOptionsPage) 
@@ -14,8 +11,9 @@ document.getElementById('options').addEventListener('click', () =>
 });
 
 
-span.addEventListener('click', () => 
-{
+document.getElementById('btn').addEventListener('click', () => {
+  const span = document.getElementById('btn');
+  console.log(span.checked)
   if (span.checked) 
   {
     SendStatus('yes');
@@ -26,13 +24,14 @@ span.addEventListener('click', () =>
     SendStatus('no');
     load();
   }
-});
+})
 
 
 document.body.onload = async () => 
 {
   load();
 };
+
 
 load = async () =>
 {
@@ -53,8 +52,6 @@ load = async () =>
 }
 
 
-
-
 let filter = async () => 
 {
     const arr = document.querySelector('div');
@@ -62,12 +59,19 @@ let filter = async () =>
 };
 
 
+
 let LoadData = async (isChecked,counter,currrent_url) =>
 {
   filter();
   let temp = 0;
+
+  const span = document.getElementById('btn');
+  if (isChecked == 'yes') span.checked = true
+  else span.checked = false;
+ 
   if (currrent_url.includes('amazon')) {temp = counter;}
   if (isChecked == 'yes' && currrent_url.includes('amazon')) temp = counter
+
   let h2 = document.createElement('h2');
   let tbody = document.createElement('tbody');
   let text = document.createTextNode('Authors Blocked');
@@ -93,6 +97,7 @@ let getCounters = async (msg) =>
     });
   })
 };
+
 
 let getIsChecked = async (msg) =>
 {

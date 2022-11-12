@@ -1,19 +1,12 @@
 //TODO Make function async and add await
 //TODO Fix any formatting, spacing, and make sure function are on bottom.
 
-let authors = [];
-
-
-
-
-
 
 document.getElementById("reset").onclick = () => 
 {
   let authors = [];
   authors.length = 0;
-  let msg = {SendingAuthors: authors}
-  SendAuthors(msg);
+  SendAuthors({SendingAuthors: authors});
   load();
 };
 
@@ -24,47 +17,69 @@ document.body.onload = async () =>
 };
 
 
-const insertAuthor = async (first,last) =>
-{
-  let name = {};
-  name.first_name = first;
-  name.last_name = last;
-  authors.push(name);
-};
-
-
 const load = async () =>
 {
   filter();
-  createTableElements();
+  
   try {
-        await getAuthors();
-        show();
+        await getAuthors({question: 'Authors'}).then((response) => {
+          let answer = insertAuthor(response)
+          answer.then((authors) => {
+            createTableElements(authors);
+              show(authors);
+          })
+        })
   }
   catch {
           console.log('error');
+          let authors = [];
+          createTableElements(authors)
   }
 };
 
 
-const getAuthors = async () =>
+const getAuthors = async (msg) =>
 {
   return new Promise((resolve, reject) => {
-    authors.length = 0;
-    chrome.runtime.sendMessage({question: "Authors"}, function(response) 
+    chrome.runtime.sendMessage(msg, function(response) 
       {
-        if (typeof response.Sending == 'undefined') {reject()}
-        for (const author of response.Sending) 
-          {
-            insertAuthor(author.first_name,author.last_name);
-          }
-        resolve();
+        if (typeof response.Sending == 'undefined') 
+        {
+          reject()
+        }
+        else 
+        {
+          resolve(response);
+        }
+        
     })
 	});
 };
 
 
-function filter() 
+const insertAuthor = async (response) => 
+{
+	let authors = [];
+	return new Promise((resolve,reject) =>
+	{
+		for (const author of response.Sending) 
+		{			
+			let name = {};
+			name.first_name = author.first_name;
+			name.last_name = author.last_name;
+			authors.push(name);
+		}
+		if (typeof response.Sending == 'undefined') 
+		{
+			console.log("Error receiving author data! ");
+			reject();
+		}
+		else resolve(authors);
+	})
+}
+
+
+const filter = () => 
 {
   
   const arr = document.querySelector('div');
@@ -87,7 +102,7 @@ const SendAuthors = async (msg)  =>
 };
 
 
-const createTableElements = async () =>
+const createTableElements = async (authors) =>
 {
   
   let table = document.createElement('table');
@@ -119,15 +134,24 @@ const createTableElements = async () =>
   {
     let first = document.getElementById('first_name').value;
     let last = document.getElementById('last_name').value;
-    insertAuthor(first,last);
-    let msg = {SendingAuthors: authors};
-    await  SendAuthors(msg);
-    load();
+    try 
+    {
+      let name = {};
+      name.first_name = first;
+      name.last_name = last;
+      authors.push(name);
+      await  SendAuthors({SendingAuthors: authors});
+      load();
+    }
+    catch 
+    {
+            console.log('Error')
+    }
   });
-  arr = [fn,ln,btnAdd];
 
+
+  arr = [fn,ln,btnAdd];
   tr = document.createElement('tr');
-    
     for (const element of arr) 
     {
         let td = document.createElement('td');
@@ -135,15 +159,16 @@ const createTableElements = async () =>
         tr.appendChild(td);
         tbody.appendChild(tr);
     }
+
   table.appendChild(tbody);
   document.getElementById("blocklist").appendChild(table);
 };
 
 
-const show = async () => 
+const show = async (authors) => 
 {
     let tbody  = document.getElementById('blocklist').getElementsByTagName('table')[0].getElementsByTagName('tbody')[0];
-    
+  
     for (let i = 0; i < authors.length; i++)
     {  
       let tr = document.createElement('tr')
@@ -175,4 +200,3 @@ const show = async () =>
   }
   document.getElementById('blocklist').appendChild(tbody);
 };
-

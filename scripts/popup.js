@@ -33,7 +33,7 @@ document.body.onload = async () =>
 };
 
 
-load = async () =>
+const load = async () =>
 {
   try {
     await getIsChecked({question: 'ischeck'}).then((response) => {
@@ -52,7 +52,7 @@ load = async () =>
 }
 
 
-let filter = async () => 
+const filter = async () => 
 {
     const arr = document.querySelector('div');
     arr.innerHTML ='';
@@ -60,7 +60,7 @@ let filter = async () =>
 
 
 
-let LoadData = async (isChecked,counter,currrent_url) =>
+const LoadData = async (isChecked,counter,currrent_url) =>
 {
   filter();
   let temp = 0;
@@ -87,7 +87,7 @@ let LoadData = async (isChecked,counter,currrent_url) =>
 }; 
 
 
-let getCounters = async (msg) =>
+const getCounters = async (msg) =>
 {
   return new Promise((resolve,reject) => {
     chrome.runtime.sendMessage(msg, function(response) 
@@ -99,7 +99,7 @@ let getCounters = async (msg) =>
 };
 
 
-let getIsChecked = async (msg) =>
+const getIsChecked = async (msg) =>
 {
   return new Promise((resolve,reject) => {
     chrome.runtime.sendMessage(msg, function(response) 
@@ -111,7 +111,7 @@ let getIsChecked = async (msg) =>
 }
 
 
-let getCurrentUrl = async (msg) =>
+const getCurrentUrl = async (msg) =>
 {
   return new Promise((resolve,reject) => {
     chrome.runtime.sendMessage(msg,function(response)
@@ -125,7 +125,7 @@ let getCurrentUrl = async (msg) =>
 };
 
 
-let SendStatus = (status) =>
+const SendStatus = (status) =>
 {
   chrome.runtime.sendMessage({SendingIsChecked: status});
 }

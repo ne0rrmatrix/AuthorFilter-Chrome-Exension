@@ -29,7 +29,7 @@ window.addEventListener('click', async () =>
 })
 
 
-let load = async () =>
+const load = async () =>
 {
 	try {
 		await getAuthors({question: 'Authors'}).then((response) =>
@@ -92,7 +92,7 @@ const filter = async (authors,ischecked) =>
 }
 
 
-let insertAuthor = async (response) => 
+const insertAuthor = async (response) => 
 {
 	let authors = [];
 	return new Promise((resolve,reject) =>

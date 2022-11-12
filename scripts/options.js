@@ -1,119 +1,85 @@
 //TODO Fix any formatting, spacing, and make sure function are on bottom.
 
-
-document.getElementById("reset").onclick = () => 
-{
+document.getElementById("reset").onclick = () => {
   let authors = [];
   authors.length = 0;
-  SendAuthors({SendingAuthors: authors});
+  SendAuthors({ SendingAuthors: authors });
   load();
 };
 
-
-document.body.onload = async () =>
-{
+document.body.onload = async () => {
   load();
 };
 
-
-const load = async () =>
-{
+const load = async () => {
   filter();
-  
+
   try {
-        await getAuthors({question: 'Authors'}).then((response) => {
-          let answer = insertAuthor(response)
-          answer.then((authors) => {
-            createTableElements(authors);
-              show(authors);
-          })
-        })
-  }
-  catch {
-          console.log('error');
-          let authors = [];
-          createTableElements(authors)
+    await getAuthors({ question: "Authors" }).then((response) => {
+      let answer = insertAuthor(response);
+      answer.then((authors) => {
+        createTableElements(authors);
+        show(authors);
+      });
+    });
+  } catch {
+    console.log("error");
+    let authors = [];
+    createTableElements(authors);
   }
 };
 
-
-const getAuthors = async (msg) =>
-{
+const getAuthors = async (msg) => {
   return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(msg, function(response) 
-      {
-        if (typeof response.Sending == 'undefined') 
-        {
-          reject()
-        }
-        else 
-        {
-          resolve(response);
-        }
-        
-    })
-	});
+    chrome.runtime.sendMessage(msg, function (response) {
+      if (typeof response.Sending == "undefined") reject();
+      resolve(response);
+    });
+  });
 };
 
+const insertAuthor = async (response) => {
+  return new Promise((resolve, reject) => {
+    if (typeof response.Sending == "undefined") {
+      reject();
+    }
+    let authors = [];
+    for (const author of response.Sending) {
+      let name = {};
+      name.first_name = author.first_name;
+      name.last_name = author.last_name;
+      authors.push(name);
+    }
+    resolve(authors);
+  });
+};
 
-const insertAuthor = async (response) => 
-{
-	let authors = [];
-	return new Promise((resolve,reject) =>
-	{
-		for (const author of response.Sending) 
-		{			
-			let name = {};
-			name.first_name = author.first_name;
-			name.last_name = author.last_name;
-			authors.push(name);
-		}
-		if (typeof response.Sending == 'undefined') 
-		{
-			console.log("Error receiving author data! ");
-			reject();
-		}
-		else resolve(authors);
-	})
-}
+const filter = () => {
+  const arr = document.querySelector("div");
+  arr.innerHTML = "";
+};
 
-
-const filter = () => 
-{
-  
-  const arr = document.querySelector('div');
-    arr.innerHTML ='';
-}
-
-
-const SendAuthors = async (msg)  => 
-{
-  return new Promise((resolve,reject) => {
-    chrome.runtime.sendMessage(msg, function(response)
-    {
-      if (typeof response.answer == 'undefined')
-      {
+const SendAuthors = async (msg) => {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(msg, function (response) {
+      if (typeof response.answer == "undefined") {
         reject();
       }
-      else resolve(response);
+      resolve(response);
     });
-  })
+  });
 };
 
+const createTableElements = async (authors) => {
+  let table = document.createElement("table");
+  let tbody = document.createElement("tbody");
+  let tr = document.createElement("tr");
 
-const createTableElements = async (authors) =>
-{
-  
-  let table = document.createElement('table');
-  let tbody = document.createElement('tbody');
-  let tr = document.createElement('tr');
-    
-  let arr = ['First Name','Last Name','Del'];
-  
-  for (const element of arr) 
-  {
-    let th = document.createElement('th'); 
-    let text = document.createTextNode(element)
+  let arr = ["First Name", "Last Name", "Del"];
+
+  for (const element of arr) {
+    let th = document.createElement("th");
+    let text = document.createTextNode(element);
     th.appendChild(text);
     tr.appendChild(th);
     tbody.appendChild(tr);
@@ -123,79 +89,73 @@ const createTableElements = async (authors) =>
   fn.id = "first_name";
   let ln = document.createElement("input");
   ln.id = "last_name";
-  
-  let btnAdd = document.createElement('button');
+
+  let btnAdd = document.createElement("button");
   btnAdd.innerText = "Add";
   btnAdd.id = "Add";
   btnAdd.className = "button";
 
-  btnAdd.addEventListener('click', async () => 
-  {
-    let first = document.getElementById('first_name').value;
-    let last = document.getElementById('last_name').value;
-    try 
-    {
+  arr = [fn, ln, btnAdd];
+  tr = document.createElement("tr");
+  for (const element of arr) {
+    let td = document.createElement("td");
+    td.appendChild(element);
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+
+  table.appendChild(tbody);
+  document.getElementById("blocklist").appendChild(table);
+  btnEventListener(authors);
+};
+
+const btnEventListener = (authors) => {
+  btnAdd.addEventListener("click", async () => {
+    let first = document.getElementById("first_name").value;
+    let last = document.getElementById("last_name").value;
+    try {
       let name = {};
       name.first_name = first;
       name.last_name = last;
       authors.push(name);
-      await  SendAuthors({SendingAuthors: authors});
+      await SendAuthors({ SendingAuthors: authors });
       load();
-    }
-    catch 
-    {
-            console.log('Error')
+    } catch {
+      console.log("Error");
     }
   });
-
-
-  arr = [fn,ln,btnAdd];
-  tr = document.createElement('tr');
-    for (const element of arr) 
-    {
-        let td = document.createElement('td');
-        td.appendChild(element);
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-    }
-
-  table.appendChild(tbody);
-  document.getElementById("blocklist").appendChild(table);
 };
 
+const show = async (authors) => {
+  let tbody = document
+    .getElementById("blocklist")
+    .getElementsByTagName("table")[0]
+    .getElementsByTagName("tbody")[0];
 
-const show = async (authors) => 
-{
-    let tbody  = document.getElementById('blocklist').getElementsByTagName('table')[0].getElementsByTagName('tbody')[0];
-  
-    for (let i = 0; i < authors.length; i++)
-    {  
-      let tr = document.createElement('tr')
-      tr.id = i;
-      let fn = document.createTextNode(authors[i].first_name);
-      let ln = document.createTextNode(authors[i].last_name);
-      let btnDel = document.createElement('button');
-      btnDel.innerText = "Del";
-      btnDel.id = "del";
-      btnDel.className = "button button3";
-      let arr = [fn,ln,btnDel];
-    
-      for (const element of arr)
-      {
-          
-          let td = document.createElement('td');
-          td.appendChild(element);
-          tr.appendChild(td);
-          tbody.appendChild(tr);          
-      }
+  for (let i = 0; i < authors.length; i++) {
+    let tr = document.createElement("tr");
+    tr.id = i;
+    let fn = document.createTextNode(authors[i].first_name);
+    let ln = document.createTextNode(authors[i].last_name);
+    let btnDel = document.createElement("button");
+    btnDel.innerText = "Del";
+    btnDel.id = "del";
+    btnDel.className = "button button3";
+    let arr = [fn, ln, btnDel];
 
-      btnDel.addEventListener('click', async () => 
-            {
-              authors.splice(authors[i],1);
-              let msg = {SendingAuthors: authors}
-              await SendAuthors(msg);
-              load();          
-            });
+    for (const element of arr) {
+      let td = document.createElement("td");
+      td.appendChild(element);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
+
+    btnDel.addEventListener("click", async () => {
+      authors.splice(authors[i], 1);
+      let msg = { SendingAuthors: authors };
+      await SendAuthors(msg);
+      load();
+    });
   }
-  document.getElementById('blocklist').appendChild(tbody);
+  document.getElementById("blocklist").appendChild(tbody);
 };

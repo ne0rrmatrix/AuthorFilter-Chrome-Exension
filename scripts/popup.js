@@ -23,30 +23,39 @@ document.body.onload = async () => {
 
 const load = async () => {
   try {
-    await getIsChecked({ question: "ischeck" }).then((response) => {
+    await getIsChecked({ question: "ischeck" }).then((ischecked) => {
       getCurrentUrl({ question: "url" }).then((currrent_url) => {
-        getCounters({ question: "Counter" }).then((counter) => {
-          if (response.Sendingischeck == "yes") span.checked = true;
-          else span.checked = false;
-          LoadData(
-            response.Sendingischeck,
-            counter.SendingCounter,
-            currrent_url.SendingUrl
-          );
-        });
+        loadCounter(ischecked, currrent_url);
       });
     });
   } catch {
     console.log("error!");
   }
 };
-
+const loadCounter = async (ischecked, currrent_url) => {
+  try {
+    await getCounters({ question: "Counter" }).then((counter) => {
+      setIschecked(ischecked, currrent_url, counter);
+    });
+  } catch {}
+};
 const filter = async () => {
   const arr = document.querySelector("div");
   arr.innerHTML = "";
 };
-
-const LoadData = async (isChecked, counter, currrent_url) => {
+const setIschecked = (ischecked, currrent_url, counter) => {
+  if (ischecked.Sendingischeck == "yes") {
+    span.checked = true;
+  } else {
+    span.checked = false;
+  }
+  createTable(
+    ischecked.Sendingischeck,
+    counter.SendingCounter,
+    currrent_url.SendingUrl
+  );
+};
+const createTable = async (isChecked, counter, currrent_url) => {
   filter();
   let temp = 0;
 
@@ -54,9 +63,6 @@ const LoadData = async (isChecked, counter, currrent_url) => {
   if (isChecked == "yes") span.checked = true;
   else span.checked = false;
 
-  if (currrent_url.includes("amazon")) {
-    temp = counter;
-  }
   if (isChecked == "yes" && currrent_url.includes("amazon")) temp = counter;
 
   let h2 = document.createElement("h2");
@@ -77,7 +83,7 @@ const getCounters = async (msg) => {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(msg, function (response) {
       if (typeof response.SendingCounter == "undefined") reject();
-      else resolve(response);
+      resolve(response);
     });
   });
 };
@@ -86,7 +92,7 @@ const getIsChecked = async (msg) => {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(msg, function (response) {
       if (typeof response.Sendingischeck == "undefined") reject();
-      else resolve(response);
+      resolve(response);
     });
   });
 };
@@ -95,7 +101,7 @@ const getCurrentUrl = async (msg) => {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(msg, function (response) {
       if (typeof response.SendingUrl == "undefined") reject();
-      else resolve(response);
+      resolve(response);
     });
   });
 };

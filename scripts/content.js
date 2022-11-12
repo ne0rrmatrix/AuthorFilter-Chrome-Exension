@@ -48,6 +48,7 @@ const startFilter = async (authors, response) => {
     console.log("Author Filter Turned off. No Filtering taking place!");
   }
 };
+
 const addObserverIfDesiredNodeAvailable = () => {
   let composeBox = document.querySelector("#search");
 

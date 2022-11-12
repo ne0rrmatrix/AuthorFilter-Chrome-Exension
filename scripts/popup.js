@@ -11,9 +11,9 @@ document.getElementById('options').addEventListener('click', () =>
 });
 
 
-document.getElementById('btn').addEventListener('click', () => {
+document.getElementById('btn').addEventListener('click', () => 
+{
   const span = document.getElementById('btn');
-  console.log(span.checked)
   if (span.checked) 
   {
     SendStatus('yes');
@@ -35,7 +35,8 @@ document.body.onload = async () =>
 
 const load = async () =>
 {
-  try {
+  try 
+  {
     await getIsChecked({question: 'ischeck'}).then((response) => {
       getCurrentUrl({question: 'url'}).then((currrent_url) => {
         getCounters({question: 'Counter'}).then((counter) => {

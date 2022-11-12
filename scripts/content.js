@@ -1,6 +1,3 @@
-// TODO test test test!!!!
-// TODO Clean up spacing, fix any formatting.
-
 let counter = 0;
 
 const composeObserver = new MutationObserver(() => {
@@ -30,6 +27,7 @@ const loadAuthors = async () => {
     console.log("error!");
   }
 };
+
 const loadIschecked = async (authors) => {
   try {
     await getIsChecked({ question: "ischeck" }).then((response) => {
@@ -39,6 +37,7 @@ const loadIschecked = async (authors) => {
     console.log("error!");
   }
 };
+
 const startFilter = async (authors, response) => {
   try {
     await filter(authors, response).then(() => {

@@ -1,5 +1,3 @@
-//TODO Fix any formatting, spacing, and make sure function are on bottom.
-
 document.getElementById("reset").onclick = () => {
   let authors = [];
   authors.length = 0;
@@ -110,7 +108,7 @@ const createTableElements = async (authors) => {
 };
 
 const btnEventListener = (authors) => {
-  btnAdd.addEventListener("click", async () => {
+  document.getElementById('Add').addEventListener("click", async () => {
     let first = document.getElementById("first_name").value;
     let last = document.getElementById("last_name").value;
     try {

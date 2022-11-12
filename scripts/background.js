@@ -28,13 +28,13 @@ chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
         if (request.question === 'Authors') sendResponse({Sending: authors});
-        if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
+        if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })}
         if (request.question === 'url') sendResponse({SendingUrl: currrent_url});    
         if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge();if (ischecked == 'no'){counter = 0}};
-        if (request.SendingAuthors) {sendResponse({answer: "confirmed!"});SaveAuthorData(request.SendingAuthors)};
+        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge();if (ischecked == 'no'){counter = 0}}
+        if (request.SendingAuthors) {sendResponse({answer: "confirmed!"});SaveAuthorData(request.SendingAuthors)}
         if (request.Counter) {counter = request.Counter;SetBadge();}
-    });
+    })
 
 
 chrome.tabs.onActivated.addListener(function(activeInfo) 
@@ -139,7 +139,7 @@ function SaveAuthorData(response)
     authors.length = 0;
     for (const author of response){
         insertAuthor(author.first_name,author.last_name);
-    };
+    }
     chrome.storage.sync.set({'authors': authors}, function() 
     {
     });

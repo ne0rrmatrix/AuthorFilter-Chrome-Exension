@@ -32,13 +32,13 @@ document.body.onload = async () =>
 };
 
 
-const insertAuthor = (first,last) =>
+const insertAuthor = async (first,last) =>
 {
   let name = {};
   name.first_name = first;
   name.last_name = last;
   authors.push(name);
-}
+};
 
 
 const load = async () =>
@@ -135,7 +135,7 @@ const createTableElements = async () =>
     }
   table.appendChild(tbody);
   document.getElementById("blocklist").appendChild(table);
-}
+};
 
 
 const show = async () => 
@@ -172,5 +172,5 @@ const show = async () =>
             });
   }
   document.getElementById('blocklist').appendChild(tbody);
-}
+};
 

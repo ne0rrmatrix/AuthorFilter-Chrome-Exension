@@ -1,3 +1,13 @@
+let getImports = () => {
+  return import(
+    (chrome.runtime.getURL || chrome.extension.getURL)("/scripts/settings.js")
+  );
+};
+
+let importSettings = async () => {
+  let result = await (await getImports()).loadSettings();
+  return result;
+};
 document.getElementById("options").addEventListener("click", () => {
   if (chrome.runtime.openOptionsPage) {
     chrome.runtime.openOptionsPage();
@@ -22,41 +32,32 @@ document.body.onload = async () => {
 };
 
 const load = async () => {
-  try {
-    await getIsChecked({ question: "ischeck" }).then((ischecked) => {
-      getCurrentUrl({ question: "url" }).then((currrent_url) => {
-        loadCounter(ischecked, currrent_url);
-      });
-    });
-  } catch {
-    console.log("error!");
-  }
+  let response = await getSettings({ question: "settings" });
+  let settings = await importSettings();
+  settings.addAll(
+    response.counter,
+    response.current_url,
+    response.ischeck,
+    response.author
+  );
+  createTable(
+    settings.getIschecked(),
+    settings.getCounter(),
+    settings.getUrl()
+  );
 };
-
-const loadCounter = async (ischecked, currrent_url) => {
-  try {
-    await getCounters({ question: "Counter" }).then((counter) => {
-      setIschecked(ischecked, currrent_url, counter);
-    });
-  } catch {}
-};
-
 const filter = async () => {
   const arr = document.querySelector("div");
   arr.innerHTML = "";
 };
 
-const setIschecked = (ischecked, currrent_url, counter) => {
-  if (ischecked.Sendingischeck == "yes") {
-    span.checked = true;
-  } else {
-    span.checked = false;
-  }
-  createTable(
-    ischecked.Sendingischeck,
-    counter.SendingCounter,
-    currrent_url.SendingUrl
-  );
+const getSettings = async (msg) => {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(msg, function (response) {
+      if (typeof response.SendingSettings == "undefined") reject();
+      resolve(response.SendingSettings);
+    });
+  });
 };
 
 const createTable = async (isChecked, counter, currrent_url) => {
@@ -64,10 +65,15 @@ const createTable = async (isChecked, counter, currrent_url) => {
   let temp = 0;
 
   const span = document.getElementById("btn");
-  if (isChecked == "yes") span.checked = true;
-  else span.checked = false;
-
-  if (isChecked == "yes" && currrent_url.includes("amazon")) temp = counter;
+  if (isChecked == "yes") {
+    span.checked = true;
+  } else span.checked = false;
+  if (
+    isChecked == "yes" &&
+    currrent_url.includes("amazon") &&
+    typeof counter != "undefined"
+  )
+    temp = counter;
 
   let h2 = document.createElement("h2");
   let tbody = document.createElement("tbody");
@@ -81,33 +87,6 @@ const createTable = async (isChecked, counter, currrent_url) => {
   tbody.appendChild(h2);
 
   document.getElementById("AuthorsBlocked").appendChild(tbody);
-};
-
-const getCounters = async (msg) => {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(msg, function (response) {
-      if (typeof response.SendingCounter == "undefined") reject();
-      resolve(response);
-    });
-  });
-};
-
-const getIsChecked = async (msg) => {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(msg, function (response) {
-      if (typeof response.Sendingischeck == "undefined") reject();
-      resolve(response);
-    });
-  });
-};
-
-const getCurrentUrl = async (msg) => {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(msg, function (response) {
-      if (typeof response.SendingUrl == "undefined") reject();
-      resolve(response);
-    });
-  });
 };
 
 const SendStatus = (status) => {

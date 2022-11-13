@@ -1,11 +1,9 @@
 //TODO Make functions async and add await.
 //TODO Fix spacing and formatting.
+"use strict";
+import * as module from "/scripts/settings.js";
 
-let authors = [];
-let sponsored = false;
-let counter = 0;
-let currrent_url = "";
-let ischecked = "";
+let settings = new module.Settings();
 
 const readLocalStorage = async (key) => {
   return new Promise((resolve, reject) => {
@@ -13,18 +11,18 @@ const readLocalStorage = async (key) => {
       if (result[key] === undefined) {
         reject();
       }
-        resolve(result[key]);
+      resolve(result[key]);
     });
   });
 };
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.SendingIsChecked) {
-    ischecked = request.SendingIsChecked;
     SaveIsChecked(request.SendingIsChecked);
+    settings.addIschecked(request.SendingIsChecked);
     SetBadge();
-    if (ischecked == "no") {
-      counter = 0;
+    if (settings.getIschecked() == "no") {
+      settings.addCounter(0);
     }
   }
   if (request.SendingAuthors) {
@@ -32,29 +30,26 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     SaveAuthorData(request.SendingAuthors);
   }
   if (request.Counter) {
-    counter = request.Counter;
+    settings.addCounter(request.Counter);
     SetBadge();
   }
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.question === "Authors") sendResponse({ Sending: authors });
-  if (request.question === "ischeck") {
-    sendResponse({ Sendingischeck: ischecked });
+  if (request.question === "settings") {
+    sendResponse({ SendingSettings: settings });
   }
-  if (request.question === "url") sendResponse({ SendingUrl: currrent_url });
-  if (request.question === "Counter") sendResponse({ SendingCounter: counter });
 });
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   chrome.tabs.get(activeInfo.tabId, function (tab) {
-    currrent_url = tab.url;
+    settings.AddUrl(tab.url);
     SetBadge();
   });
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (!changeInfo.url == "undefined") {
-    currrent_url = changeInfo.url;
+    settings.AddUrl(changeInfo.url);
     SetBadge();
   }
 });
@@ -62,62 +57,51 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 const getAuthors = async () => {
   try {
     let key1 = await readLocalStorage("authors");
-    authors.length = 0;
-    for (const author of key1) {
-      insertAuthor(author.first_name, author.last_name);
-    }
+    let temp = [];
+    settings.addAuthors(temp);
+    settings.addAuthors(key1);
   } catch {}
 };
 
 const getCounters = async () => {
   try {
     let key2 = await readLocalStorage("counter");
-    counter = key2;
+    settings.addCounter(key2);
   } catch {}
 };
 
 const getIsChecked = async () => {
   try {
     let key3 = await readLocalStorage("ischecked");
-    ischecked = key3;
+    settings.addIschecked(key3);
   } catch {}
 };
 
 const SetBadge = () => {
-  if (!currrent_url.includes("amazon") || ischecked == "no") {
+  if (
+    !settings.getUrl().includes("amazon") ||
+    settings.getIschecked() == "no"
+  ) {
     chrome.action.setBadgeText({ text: "0" });
     chrome.action.setBadgeBackgroundColor({ color: "#9688F1" });
   } else {
-    chrome.action.setBadgeText({ text: counter.toString() });
+    chrome.action.setBadgeText({ text: String(settings.getCounter()) });
     chrome.action.setBadgeBackgroundColor({ color: "#9688F1" });
   }
 };
 
-const insertAuthor = (first, last) => {
-  let name = {};
-  name.first_name = first;
-  name.last_name = last;
-  authors.push(name);
-};
-
 const SaveIsChecked = (response) => {
-  ischecked = response;
-
   chrome.storage.sync.set({ ischecked: response }, function () {});
 };
 
-const SendingCounters = () => {
-  if (currrent_url.includes("amazon")) {
-    chrome.runtime.sendMessage({ sendingCounters: counter });
-  }
-};
-
 const SaveAuthorData = (response) => {
-  authors.length = 0;
-  for (const author of response) {
-    insertAuthor(author.first_name, author.last_name);
-  }
+  let temp = [];
+  settings.addAuthors(temp);
+  settings.addAuthors(response);
+  // console.log(settings.getAuthors())
+  const authors = settings.getAuthors();
   chrome.storage.sync.set({ authors: authors }, function () {});
+  getAuthors();
 };
 
 const SaveCounter = (response) => {

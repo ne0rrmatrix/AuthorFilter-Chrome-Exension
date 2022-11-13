@@ -1,3 +1,14 @@
+let getImports = () => {
+  return import(
+    (chrome.runtime.getURL || chrome.extension.getURL)("/scripts/settings.js")
+  );
+};
+
+let importSettings = async () => {
+  let result = await (await getImports()).loadSettings();
+  return result;
+};
+
 document.getElementById("reset").onclick = () => {
   let authors = [];
   authors.length = 0;
@@ -6,50 +17,23 @@ document.getElementById("reset").onclick = () => {
 };
 
 document.body.onload = async () => {
+  filter();
   load();
 };
 
 const load = async () => {
   filter();
-
-  try {
-    await getAuthors({ question: "Authors" }).then((response) => {
-      let answer = insertAuthor(response);
-      answer.then((authors) => {
-        createTableElements(authors);
-        show(authors);
-      });
-    });
-  } catch {
-    console.log("error");
-    let authors = [];
-    createTableElements(authors);
-  }
-};
-
-const getAuthors = async (msg) => {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(msg, function (response) {
-      if (typeof response.Sending == "undefined") reject();
-      resolve(response);
-    });
-  });
-};
-
-const insertAuthor = async (response) => {
-  return new Promise((resolve, reject) => {
-    if (typeof response.Sending == "undefined") {
-      reject();
-    }
-    let authors = [];
-    for (const author of response.Sending) {
-      let name = {};
-      name.first_name = author.first_name;
-      name.last_name = author.last_name;
-      authors.push(name);
-    }
-    resolve(authors);
-  });
+  let response = await getSettings({ question: "settings" });
+  let settings = await importSettings();
+  settings.addAll(
+    response.counter,
+    response.current_url,
+    response.ischeck,
+    response.author
+  );
+  console.log(settings.getAuthors());
+  await createTableElements(settings.getAuthors());
+  await show(settings.getAuthors());
 };
 
 const filter = () => {
@@ -115,7 +99,9 @@ const btnEventListener = (authors) => {
       let name = {};
       name.first_name = first;
       name.last_name = last;
+
       authors.push(name);
+      console.log(authors);
       await SendAuthors({ SendingAuthors: authors });
       load();
     } catch {
@@ -147,7 +133,12 @@ const show = async (authors) => {
       tr.appendChild(td);
       tbody.appendChild(tr);
     }
-
+    console.log(
+      "Delete Authors list: " +
+        authors[i].first_name +
+        " " +
+        authors[i].last_name
+    );
     btnDel.addEventListener("click", async () => {
       authors.splice(authors[i], 1);
       let msg = { SendingAuthors: authors };
@@ -156,4 +147,13 @@ const show = async (authors) => {
     });
   }
   document.getElementById("blocklist").appendChild(tbody);
+};
+
+const getSettings = async (msg) => {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(msg, function (response) {
+      if (typeof response.SendingSettings == "undefined") reject();
+      resolve(response.SendingSettings);
+    });
+  });
 };

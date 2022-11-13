@@ -1,46 +1,55 @@
 let counter = 0;
+let getImports = () => {
+  return import(
+    (chrome.runtime.getURL || chrome.extension.getURL)("/scripts/settings.js")
+  );
+};
+
+let importSettings = async () => {
+  let result = await (await getImports()).loadSettings();
+  return result;
+};
 
 const composeObserver = new MutationObserver(() => {
   composeObserver.disconnect();
-  loadAuthors();
+  load();
 });
 
 document.body.onload = async () => {
-  await loadAuthors();
+  await load();
+};
+
+let load = async () => {
+  let response = await getSettings({ question: "settings" });
+  let settings = await importSettings();
+
+  settings.addAll(
+    response.counter,
+    response.current_url,
+    response.ischeck,
+    response.author
+  );
+  startFilter(settings);
 };
 
 window.addEventListener("click", async () => {
   counter = 0;
   composeObserver.disconnect();
-  await loadAuthors();
+  await load();
 });
 
-const loadAuthors = async () => {
-  try {
-    await getAuthors({ question: "Authors" }).then((response) => {
-      let answer = insertAuthor(response);
-      answer.then((authors) => {
-        loadIschecked(authors);
-      });
+const getSettings = async (msg) => {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(msg, function (response) {
+      if (typeof response.SendingSettings == "undefined") reject();
+      resolve(response.SendingSettings);
     });
-  } catch {
-    console.log("error!");
-  }
+  });
 };
 
-const loadIschecked = async (authors) => {
+const startFilter = async (settings) => {
   try {
-    await getIsChecked({ question: "ischeck" }).then((response) => {
-      startFilter(authors, response.Sendingischeck);
-    });
-  } catch {
-    console.log("error!");
-  }
-};
-
-const startFilter = async (authors, response) => {
-  try {
-    await filter(authors, response).then(() => {
+    await filter(settings).then(() => {
       SendData({ Counter: counter });
       addObserverIfDesiredNodeAvailable();
     });
@@ -60,22 +69,21 @@ const addObserverIfDesiredNodeAvailable = () => {
   composeObserver.observe(composeBox, config);
 };
 
-const filter = async (authors, response) =>
+const filter = async (settings) =>
   new Promise((resolve, reject) => {
-    if (response == "no") {
+    if (settings.getIschecked() == "no") {
       reject();
     } else {
       composeObserver.disconnect();
       const arr = Array.from(document.querySelectorAll("[data-index]"));
-      applyFilter(arr, authors).then(() => {
-        resolve();
-      });
+      applyFilter(arr, settings);
+      resolve();
     }
   });
 
-const applyFilter = async (arr, authors) => {
+const applyFilter = async (arr, settings) => {
   for (const element of arr) {
-    for (const author of authors) {
+    for (const author of settings.getAuthors()) {
       if (
         element.textContent.includes(author.first_name) &&
         element.textContent.includes(author.last_name)
@@ -87,40 +95,4 @@ const applyFilter = async (arr, authors) => {
   }
 };
 
-const insertAuthor = async (response) =>
-  new Promise((resolve, reject) => {
-    if (typeof response.Sending == "undefined") {
-      reject();
-    }
-    let authors = [];
-    for (const author of response.Sending) {
-      let name = {};
-      name.first_name = author.first_name;
-      name.last_name = author.last_name;
-      authors.push(name);
-    }
-    resolve(authors);
-  });
-
 const SendData = async (msg) => chrome.runtime.sendMessage(msg);
-
-const getIsChecked = async (msg) =>
-  new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(msg, function (response) {
-      if (typeof response.Sendingischeck == "undefined") {
-        reject();
-      }
-      resolve(response);
-    });
-  });
-
-const getAuthors = async (msg) =>
-  new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(msg, function (response) {
-      if (typeof response.Sending == "undefined") {
-        reject();
-      } else {
-        resolve(response);
-      }
-    });
-  });

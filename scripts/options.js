@@ -118,13 +118,12 @@ const show = async (authors) => {
 
   for (let i = 0; i < authors.length; i++) {
     let tr = document.createElement("tr");
-    tr.id = i;
     let fn = document.createTextNode(authors[i].first_name);
     let ln = document.createTextNode(authors[i].last_name);
     let btnDel = document.createElement("button");
     btnDel.innerText = "Del";
-    btnDel.id = "del" + i;
-    btnDel.className = "button button3";
+    btnDel.id = i;
+    btnDel.className = "button3";
     let arr = [fn, ln, btnDel];
 
     for (const element of arr) {
@@ -133,23 +132,21 @@ const show = async (authors) => {
       tr.appendChild(td);
       tbody.appendChild(tr);
     }
-    
-    btnDel.addEventListener("click", async () => {
-      let id = btnDel.id;
-      let removeAuthor = function(data,id) {
-        let index = data.findIndex(function(item) {
-          return item.id == id
-        })
-        data.splice(index,1)
-      }
-      removeAuthor(authors,id);
-      console.log(authors)
+  }
+  document.getElementById("blocklist").appendChild(tbody);
+  const button = document.querySelectorAll(".button3");
+  for (const element of button) {
+    element.addEventListener("click", function (e) {
+      console.log(
+        authors[e.target.id].first_name + " " + authors[e.target.id].last_name
+      );
+      authors.splice(e.target.id, 1);
+
       let msg = { SendingAuthors: authors };
-      await SendAuthors(msg);
+      SendAuthors(msg);
       load();
     });
   }
-  document.getElementById("blocklist").appendChild(tbody);
 };
 
 const getSettings = async (msg) => {

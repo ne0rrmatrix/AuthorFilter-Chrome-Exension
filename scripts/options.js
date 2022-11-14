@@ -123,7 +123,7 @@ const show = async (authors) => {
     let ln = document.createTextNode(authors[i].last_name);
     let btnDel = document.createElement("button");
     btnDel.innerText = "Del";
-    btnDel.id = "del";
+    btnDel.id = "del" + i;
     btnDel.className = "button button3";
     let arr = [fn, ln, btnDel];
 
@@ -133,14 +133,17 @@ const show = async (authors) => {
       tr.appendChild(td);
       tbody.appendChild(tr);
     }
-    console.log(
-      "Delete Authors list: " +
-        authors[i].first_name +
-        " " +
-        authors[i].last_name
-    );
+    
     btnDel.addEventListener("click", async () => {
-      authors.splice(authors[i], 1);
+      let id = btnDel.id;
+      let removeAuthor = function(data,id) {
+        let index = data.findIndex(function(item) {
+          return item.id == id
+        })
+        data.splice(index,1)
+      }
+      removeAuthor(authors,id);
+      console.log(authors)
       let msg = { SendingAuthors: authors };
       await SendAuthors(msg);
       load();

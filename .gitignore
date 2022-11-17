@@ -10,7 +10,6 @@
 
 # Built Visual Studio Code Extensions
 *.vsix
-.eslintrc.js
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

@@ -55,14 +55,12 @@ export class Settings {
   }
 }
 
-export const saveSettings = async (data) => {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sync.set(data, () => {
-      if (chrome.runtime.error) reject(console.log('Failed to save settings!'))
-      else resolve()
-    })
+export const saveSettings = async (data) => new Promise((resolve, reject) => {
+  chrome.runtime.sync.set(data, () => {
+    if (chrome.runtime.error) reject(console.log('Failed to save settings!'))
+    else resolve()
   })
-}
+})
 
 export const loadSettings = () => {
   const settings = new Settings()

@@ -2,7 +2,6 @@
 // TODO Make functions async and add await.
 // TODO Fix spacing and formatting.
 /* global chrome */
-// 'use strict'
 // eslint-disable-next-line max-len
 // eslint-disable-next-line import/no-absolute-path, import/no-import-module-exports, import/no-unresolved, import/extensions
 import * as module from '/scripts/settings.js';
@@ -64,14 +63,6 @@ const getAuthors = async () => {
     settings.addAuthors(key1);
   } catch { /* empty */ }
 };
-/**
-const getCounters = async () => {
-  try {
-    const key2 = await readLocalStorage('counter')
-    settings.addCounter(key2)
-  } catch {}
-}
-*/
 const getIsChecked = async () => {
   try {
     const key3 = await readLocalStorage('ischecked');
@@ -100,15 +91,10 @@ const SaveAuthorData = (response) => {
   const temp = [];
   settings.addAuthors(temp);
   settings.addAuthors(response);
-  // console.log(settings.getAuthors())
   const authors = settings.getAuthors();
   chrome.storage.sync.set({ authors }, () => { });
   getAuthors();
 };
-/**
-const SaveCounter = (response) => {
-  chrome.storage.sync.set({ counter: response }, function () {})
-}
-*/
+
 getAuthors();
 getIsChecked();

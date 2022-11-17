@@ -64,15 +64,6 @@ const createTableElements = async (authors) => {
     tr.appendChild(th);
     tbody.appendChild(tr);
   });
-  /**
-  for (const element of arr) {
-    const th = document.createElement('th');
-    const text = document.createTextNode(element);
-    th.appendChild(text);
-    tr.appendChild(th);
-    tbody.appendChild(tr);
-  }
-*/
   const fn = document.createElement('input');
   fn.id = 'first_name';
   const ln = document.createElement('input');
@@ -91,14 +82,6 @@ const createTableElements = async (authors) => {
     tr.appendChild(td);
     tbody.appendChild(tr);
   });
-  /**
-  for (const element of arr) {
-    const td = document.createElement('td');
-    td.appendChild(element);
-    tr.appendChild(td);
-    tbody.appendChild(tr);
-  }
-*/
   table.appendChild(tbody);
   document.getElementById('blocklist').appendChild(table);
   btnEventListener(authors);
@@ -144,14 +127,6 @@ const show = async (authors) => {
       tr.appendChild(td);
       tbody.appendChild(tr);
     });
-    /**
-    for (const element of arr) {
-      const td = document.createElement('td');
-      td.appendChild(element);
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-    }
-    */
   }
   document.getElementById('blocklist').appendChild(tbody);
   const button = document.querySelectorAll('.button3');
@@ -167,20 +142,6 @@ const show = async (authors) => {
       load();
     });
   });
-  /**
-  for (const element of button) {
-    element.addEventListener('click', (e) => {
-      console.log(
-        `${authors[e.target.id].first_name} ${authors[e.target.id].last_name}`,
-      );
-      authors.splice(e.target.id, 1);
-
-      const msg = { SendingAuthors: authors };
-      SendAuthors(msg);
-      load();
-    });
-  }
-  */
 };
 
 const getSettings = async (msg) => new Promise((resolve, reject) => {

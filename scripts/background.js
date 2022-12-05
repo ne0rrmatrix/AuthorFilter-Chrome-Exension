@@ -1,172 +1,100 @@
-var authors = [];
-var sponsored = false;
-var counter = 0;
-var currrent_url = '';
-var ischecked = '';
+/* eslint-disable no-use-before-define */
+// TODO Make functions async and add await.
+// TODO Fix spacing and formatting.
+/* global chrome */
+// eslint-disable-next-line max-len
+// eslint-disable-next-line import/no-import-module-exports, import/no-unresolved, import/extensions, import/no-absolute-path
+import * as module from '/scripts/settings.js';
 
-const readLocalStorage = async (key) => {
-    return new Promise((resolve, reject) => {
-        chrome.storage.sync.get([key], function (result) {
-        if (result[key] === undefined) {
-            reject();
-        } else {
-            resolve(result[key]);
-        }
-        });
-    });
-    };
+const settings = new module.Settings();
 
+const readLocalStorage = async (key) => new Promise((resolve, reject) => {
+  chrome.storage.sync.get([key], (result) => {
+    if (result[key] === undefined) {
+      reject(console.log('data in storage is empty!'));
+    }
+    resolve(result[key]);
+  });
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.SendingIsChecked) {
+    SaveIsChecked(request.SendingIsChecked);
+    settings.addIschecked(request.SendingIsChecked);
+    SetBadge();
+    if (settings.getIschecked() === 'no') {
+      settings.addCounter(0);
+    }
+  }
+  if (request.SendingAuthors) {
+    sendResponse({ answer: 'confirmed!' });
+    SaveAuthorData(request.SendingAuthors);
+  }
+  if (request.Counter) {
+    settings.addCounter(request.Counter);
+    SetBadge();
+  }
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.question === 'settings') {
+    sendResponse({ SendingSettings: settings });
+  }
+});
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    settings.AddUrl(tab.url);
+    SetBadge();
+  });
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  if (!changeInfo.url === 'undefined') {
+    settings.AddUrl(changeInfo.url);
+    SetBadge();
+  }
+});
+
+const getAuthors = async () => {
+  try {
+    const key1 = await readLocalStorage('authors');
+    const temp = [];
+    settings.addAuthors(temp);
+    settings.addAuthors(key1);
+  } catch { /* empty */ }
+};
+const getIsChecked = async () => {
+  try {
+    const key3 = await readLocalStorage('ischecked');
+    settings.addIschecked(key3);
+  } catch { /* empty */ }
+};
+
+const SetBadge = () => {
+  if (
+    !settings.getUrl().includes('amazon')
+    || settings.getIschecked() === 'no'
+  ) {
+    chrome.action.setBadgeText({ text: '0' });
+    chrome.action.setBadgeBackgroundColor({ color: '#9688F1' });
+  } else {
+    chrome.action.setBadgeText({ text: String(settings.getCounter()) });
+    chrome.action.setBadgeBackgroundColor({ color: '#9688F1' });
+  }
+};
+
+const SaveIsChecked = (response) => {
+  chrome.storage.sync.set({ ischecked: response }, () => { });
+};
+
+const SaveAuthorData = (response) => {
+  const temp = [];
+  settings.addAuthors(temp);
+  settings.addAuthors(response);
+  const authors = settings.getAuthors();
+  chrome.storage.sync.set({ authors }, () => { });
+  getAuthors();
+};
 
 getAuthors();
 getIsChecked();
-
-
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) 
-    {
-        if (request.Counter) {counter = request.Counter;SetBadge();}
-        if (request.question === 'Authors') sendResponse({Sending: authors});
-        if (request.SendingAuthors) {SaveAuthorData(request.SendingAuthors)};
-        if (request.question === 'Counter') sendResponse({SendingCounter: counter});
-        if (request.SendingIsChecked) {ischecked = request.SendingIsChecked;SaveIsChecked(request.SendingIsChecked);SetBadge();};
-        if (request.question === 'ischeck') {sendResponse({Sendingischeck: ischecked })};
-        if (request.question === 'url') sendResponse({SendingUrl: currrent_url});    
-    });
-
-async function getAuthors() {
-    try {
-        let key1 = await readLocalStorage('authors');
-        authors.length = 0;
-                for (const author of key1) 
-                {
-                    insertAuthor(author.first_name,author.last_name);
-                }
-        }
-    catch {
-    }
-}
-
-async function getCounters() {
-    try {
-        let key2 = await readLocalStorage('counter');
-        counter = key2;
-    }
-    catch {
-    }
-} 
-
-async function getIsChecked() {
-   try {
-    let key3 = await readLocalStorage('ischecked');
-    ischecked = key3;
-   }
-   catch {
-   }
-   
-}
-
-
-chrome.tabs.onActivated.addListener(function(activeInfo) 
-{
-    chrome.tabs.get(activeInfo.tabId, function(tab)
-    {
-        currrent_url = tab.url;
-        SetBadge(counter);
-    });
-}); 
-  
-
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) 
-{
-     if (!changeInfo.url == 'undefined') 
-     {
-        currrent_url = changeInfo.url;
-        SetBadge(counter);
-    };
- }); 
-
-
-function SetBadge()
-{
-    if (!currrent_url.includes('amazon') || ischecked == 'no')
-    {
-        chrome.action.setBadgeText({text: "0"});
-        chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
-    }
-    else
-    {
-        if (ischecked == 'yes')
-        {
-            chrome.action.setBadgeText({text: counter.toString()});
-            chrome.action.setBadgeBackgroundColor({color: '#9688F1'});
-        }
-       
-    }    
-}; 
-
-
-function insertAuthor(first,last) 
-{
-    let name = {}
-    name.first_name = first;
-    name.last_name = last;
-    authors.push(name);
-};
-
-
-function SaveIsChecked(response)
-{
-    ischecked = response;
-   // SendingIsChecked();
-    chrome.storage.sync.set({'ischecked': response}, function(){
-        if (chrome.runtime.error) {
-        }
-        if (!chrome.runtime.error)
-        {
-            
-        }
-    })
-};
-
-
-function SendingCounters()
-{
-    if (currrent_url.includes('amazon'))
-    {
-        chrome.runtime.sendMessage({sendingCounters: counter})
-    }
-}
-
-
-function SaveAuthorData(response)
-{
-    authors.length = 0;
-    for (const author of response){
-        insertAuthor(author.first_name,author.last_name);
-    }
-    chrome.storage.sync.set({'authors': authors}, function() 
-    {
-        if (chrome.runtime.error) {
-        }
-        if (!chrome.runtime.error)
-        {
-        }
-    });
-};
-
-
-function SaveCounter(response)
-{
-    chrome.storage.sync.set({'counter': response}, function()
-    {
-        if (chrome.runtime.error)
-        {
-        }
-        if (!chrome.runtime.error)
-        {
-        }
-    })
-};
-
-
-

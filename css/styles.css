@@ -37,5 +37,16 @@ tr:nth-child(even) {
   margin: 4px 2px;
   cursor: pointer;
 }
-.button3 {background-color: #f44336;} /* Red */ 
+.button3 {
+  background-color: #f44336;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 5px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;} /* Red */ 
 .button2 {background-color: #008CBA;} /* Blue */

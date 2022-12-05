@@ -1,6 +1,4 @@
 /* eslint-disable no-use-before-define */
-// TODO Make functions async and add await.
-// TODO Fix spacing and formatting.
 /* global chrome */
 // eslint-disable-next-line max-len
 // eslint-disable-next-line import/no-import-module-exports, import/no-unresolved, import/extensions, import/no-absolute-path

@@ -1,56 +1,8 @@
-/* eslint-disable no-use-before-define */
 /* global chrome */
 
 const getImports = () => import(
   (chrome.runtime.getURL || chrome.extension.getURL)('/scripts/settings.js')
 );
-
-const importSettings = async () => {
-  const result = await (await getImports()).loadSettings();
-  return result;
-};
-document.getElementById('options').addEventListener('click', () => {
-  if (chrome.runtime.openOptionsPage) {
-    chrome.runtime.openOptionsPage();
-  } else {
-    window.open(chrome.runtime.getURL('options.html'));
-  }
-});
-
-document.getElementById('btn').addEventListener('click', () => {
-  const span = document.getElementById('btn');
-  if (span.checked) {
-    SendStatus('yes');
-    load();
-  } else {
-    SendStatus('no');
-    load();
-  }
-});
-
-document.body.onload = async () => {
-  load();
-};
-
-const load = async () => {
-  const response = await getSettings({ question: 'settings' });
-  const settings = await importSettings();
-  settings.addAll(
-    response.counter,
-    response.currentUrl,
-    response.ischeck,
-    response.author,
-  );
-  createTable(
-    settings.getIschecked(),
-    settings.getCounter(),
-    settings.getUrl(),
-  );
-};
-const filter = async () => {
-  const arr = document.querySelector('div');
-  arr.innerHTML = '';
-};
 
 const getSettings = async (msg) => new Promise((resolve, reject) => {
   chrome.runtime.sendMessage(msg, (response) => {
@@ -58,6 +10,16 @@ const getSettings = async (msg) => new Promise((resolve, reject) => {
     resolve(response.SendingSettings);
   });
 });
+
+const importSettings = async () => {
+  const result = await (await getImports()).loadSettings();
+  return result;
+};
+
+const filter = async () => {
+  const arr = document.querySelector('div');
+  arr.innerHTML = '';
+};
 
 const createTable = async (isChecked, counter, currrentUrl) => {
   filter();
@@ -87,6 +49,45 @@ const createTable = async (isChecked, counter, currrentUrl) => {
   document.getElementById('AuthorsBlocked').appendChild(tbody);
 };
 
+const load = async () => {
+  const response = await getSettings({ question: 'settings' });
+  const settings = await importSettings();
+  settings.addAll(
+    response.counter,
+    response.currentUrl,
+    response.ischeck,
+    response.author,
+  );
+  createTable(
+    settings.getIschecked(),
+    settings.getCounter(),
+    settings.getUrl(),
+  );
+};
+
 const SendStatus = (status) => {
   chrome.runtime.sendMessage({ SendingIsChecked: status });
+};
+
+document.getElementById('options').addEventListener('click', () => {
+  if (chrome.runtime.openOptionsPage) {
+    chrome.runtime.openOptionsPage();
+  } else {
+    window.open(chrome.runtime.getURL('options.html'));
+  }
+});
+
+document.getElementById('btn').addEventListener('click', () => {
+  const span = document.getElementById('btn');
+  if (span.checked) {
+    SendStatus('yes');
+    load();
+  } else {
+    SendStatus('no');
+    load();
+  }
+});
+
+document.body.onload = async () => {
+  load();
 };

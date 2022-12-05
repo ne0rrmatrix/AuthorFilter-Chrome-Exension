@@ -40,8 +40,8 @@
         "scripts/content.js"
       ],
       "matches": [
-        "https://www.amazon.ca/*",
-        "https://www.amazon.com/*"
+        "https://www.amazon.ca/s?*",
+        "https://www.amazon.com/s?*"
       ]
     }
   ]

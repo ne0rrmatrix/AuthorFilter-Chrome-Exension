@@ -4,7 +4,7 @@ export class Settings {
     this.author = [];
     if (typeof counter === 'undefined') this.counter = 0;
     else this.counter = counter;
-    if (typeof ischeck === 'undefined') this.ischeck = '';
+    if (typeof ischeck === 'undefined') this.ischeck = 'yes';
     else this.ischeck = ischeck;
 
     if (typeof currentUrl === 'undefined') this.currentUrl = '';

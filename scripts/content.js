@@ -30,6 +30,7 @@ const applyFilter = async (settings) => {
 
 const composeObserver = new MutationObserver(() => {
   composeObserver.disconnect();
+  // eslint-disable-next-line no-use-before-define
   load();
 });
 const filter = async (settings) => new Promise((resolve, reject) => {

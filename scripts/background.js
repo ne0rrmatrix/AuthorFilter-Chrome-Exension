@@ -47,7 +47,7 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (!changeInfo.url === 'undefined') {
+  if (typeof changeInfo.url !== 'undefined') {
     settings.AddUrl(changeInfo.url);
     SetBadge();
   }

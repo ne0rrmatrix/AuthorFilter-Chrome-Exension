@@ -1,8 +1,0 @@
-{
-    "gitlens.hovers.autolinks.enabled": true,
-    "gitlens.hovers.autolinks.enhanced": true,
-    "[javascript]": {
-          "editor.defaultFormatter": "vscode.typescript-language-features"
-        }
-      
-}

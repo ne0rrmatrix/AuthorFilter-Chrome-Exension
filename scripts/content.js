@@ -1,9 +1,69 @@
 /* global chrome */
-let counter = 0;
-
+let counters = 0;
 const SendData = async (msg) => chrome.runtime.sendMessage(msg);
 
-const getImports = () => import((chrome.runtime.getURL || chrome.extension.getURL)('/scripts/settings.js'));
+class Settings {
+  constructor(counter, currentUrl, ischeck) {
+    this.author = [];
+    if (typeof counter === 'undefined') this.counter = 0;
+    else this.counter = counter;
+    if (typeof ischeck === 'undefined') this.ischeck = 'yes';
+    else this.ischeck = ischeck;
+
+    if (typeof currentUrl === 'undefined') this.currentUrl = '';
+    else this.currentUrl = currentUrl;
+  }
+
+  addAuthor(first, last) {
+    this.author.push({ first_name: first, last_name: last });
+  }
+
+  addAll(counter, currentUrl, ischeck, author) {
+    this.counter = counter;
+    this.currentUrl = currentUrl;
+    this.ischeck = ischeck;
+    this.author = author;
+  }
+
+  addAuthors = (authors) => {
+    this.author = authors;
+  };
+
+  addIschecked(ischeck) {
+    this.ischeck = ischeck;
+  }
+
+  addCounter(counter) {
+    this.counter = counter;
+  }
+
+  AddUrl(currentUrl) {
+    this.currentUrl = currentUrl;
+  }
+
+  getAuthors() {
+    return this.author;
+  }
+
+  getIschecked() {
+    return this.ischeck;
+  }
+
+  getCounter() {
+    return this.counter;
+  }
+
+  getUrl() {
+    return this.currentUrl;
+  }
+
+  setCounter(count) {
+    this.counter = count;
+  }
+}
+
+const settings = new Settings();
+
 const getSettings = async (msg) => new Promise((resolve, reject) => {
   chrome.runtime.sendMessage(msg, (response) => {
     if (typeof response.SendingSettings === 'undefined') reject(console.log('error'));
@@ -11,18 +71,14 @@ const getSettings = async (msg) => new Promise((resolve, reject) => {
   });
 });
 
-const importSettings = async () => {
-  const result = await (await getImports()).loadSettings();
-  return result;
-};
-const applyFilter = async (settings) => {
+const applyFilter = async () => {
   const arr = document.querySelectorAll('[data-index]');
   settings.getAuthors().forEach((author) => {
     Array.from(arr).forEach((el) => {
       if (el.textContent.includes(author.first_name) && el.textContent.includes(author.last_name)) {
         const theEl = el;
         theEl.innerHTML = '';
-        counter += 1;
+        counters += 1;
       }
     });
   });
@@ -33,12 +89,12 @@ const composeObserver = new MutationObserver(() => {
   // eslint-disable-next-line no-use-before-define
   load();
 });
-const filter = async (settings) => new Promise((resolve, reject) => {
+const filter = async () => new Promise((resolve, reject) => {
   if (settings.getIschecked() === 'no') {
     reject(console.log('error'));
   } else {
     composeObserver.disconnect();
-    applyFilter(settings);
+    applyFilter();
     resolve();
   }
 });
@@ -53,10 +109,10 @@ const addObserverIfDesiredNodeAvailable = () => {
   const config = { subtree: true, childList: true, characterData: true };
   composeObserver.observe(composeBox, config);
 };
-const startFilter = async (settings) => {
+const startFilter = async () => {
   try {
-    await filter(settings).then(() => {
-      SendData({ Counter: counter });
+    await filter().then(() => {
+      SendData({ Counter: counters });
       addObserverIfDesiredNodeAvailable();
     });
   } catch {
@@ -64,15 +120,15 @@ const startFilter = async (settings) => {
   }
 };
 const load = async () => {
-  const settings = await importSettings();
   try {
+    console.log(settings.getCounter());
     const response = await getSettings({ question: 'settings' });
     settings.addAll(response.counter, response.currentUrl, response.ischeck, response.author);
   } catch {
     console.log('No data available!');
   }
 
-  startFilter(settings);
+  startFilter();
 };
 
 document.body.onload = async () => {
@@ -80,7 +136,7 @@ document.body.onload = async () => {
 };
 
 window.addEventListener('click', async () => {
-  counter = 0;
   composeObserver.disconnect();
+  counters = 0;
   await load();
 });

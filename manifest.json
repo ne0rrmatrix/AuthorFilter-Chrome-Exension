@@ -24,14 +24,16 @@
   },
   "permissions": [
     "storage",
-    "tabs",
-    "activeTab",
-    "scripting"
+    "tabs"
   ],
   "web_accessible_resources": [
   {
     "resources":["/scripts/settings.js"],
-  "matches": ["https://www.amazon.com/*","https://www.amazon.ca/*"]
+  "matches": 
+  [
+    "https://www.amazon.com/*",
+    "https://www.amazon.ca/*"
+  ]
 }
   ],
   "content_scripts": [

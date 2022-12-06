@@ -1,4 +1,3 @@
-/* global chrome */
 const getImports = () => import(
   (chrome.runtime.getURL || chrome.extension.getURL)('/scripts/settings.js')
 );
@@ -20,17 +19,21 @@ const filter = async () => {
   arr.innerHTML = '';
 };
 
-const createTable = async (isChecked, counter, currrentUrl) => {
-  filter();
-  let temp = 0;
-
+const setIsChecked = (isChecked) => {
   const span = document.getElementById('btn');
   if (isChecked === 'yes') {
     span.checked = true;
   } else span.checked = false;
+};
+
+const createTable = async (isChecked, counter, currentUrl) => {
+  filter();
+  setIsChecked(isChecked);
+  let temp = 0;
+
   if (
     isChecked === 'yes'
-    && currrentUrl.includes('amazon')
+    && currentUrl.includes('amazon')
     && typeof counter !== 'undefined'
   ) { temp = counter; }
 

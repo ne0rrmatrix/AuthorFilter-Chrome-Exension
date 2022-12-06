@@ -1,4 +1,3 @@
-/* global chrome */
 // eslint-disable-next-line max-len
 // eslint-disable-next-line import/no-import-module-exports, import/no-unresolved, import/extensions, import/no-absolute-path
 import * as module from '/scripts/settings.js';

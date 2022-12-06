@@ -1,5 +1,4 @@
 /* eslint-disable no-use-before-define */
-/* global chrome */
 
 const getImports = () => import(
   (chrome.runtime.getURL || chrome.extension.getURL)('/scripts/settings.js')

@@ -1,4 +1,3 @@
-/* global chrome */
 export class Settings {
   constructor(counter, currentUrl, ischeck) {
     this.author = [];

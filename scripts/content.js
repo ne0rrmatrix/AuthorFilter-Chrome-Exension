@@ -1,4 +1,3 @@
-/* global chrome */
 let counter = 0;
 const SendData = async (msg) => chrome.runtime.sendMessage(msg);
 

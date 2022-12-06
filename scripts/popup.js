@@ -1,61 +1,7 @@
 /* global chrome */
-class Settings {
-  constructor(counter, currentUrl, ischeck) {
-    this.author = [];
-    if (typeof counter === 'undefined') this.counter = 0;
-    else this.counter = counter;
-    if (typeof ischeck === 'undefined') this.ischeck = 'yes';
-    else this.ischeck = ischeck;
-
-    if (typeof currentUrl === 'undefined') this.currentUrl = '';
-    else this.currentUrl = currentUrl;
-  }
-
-  addAuthor(first, last) {
-    this.author.push({ first_name: first, last_name: last });
-  }
-
-  addAll(counter, currentUrl, ischeck, author) {
-    this.counter = counter;
-    this.currentUrl = currentUrl;
-    this.ischeck = ischeck;
-    this.author = author;
-  }
-
-  addAuthors = (authors) => {
-    this.author = authors;
-  };
-
-  addIschecked(ischeck) {
-    this.ischeck = ischeck;
-  }
-
-  addCounter(counter) {
-    this.counter = counter;
-  }
-
-  AddUrl(currentUrl) {
-    this.currentUrl = currentUrl;
-  }
-
-  getAuthors() {
-    return this.author;
-  }
-
-  getIschecked() {
-    return this.ischeck;
-  }
-
-  getCounter() {
-    return this.counter;
-  }
-
-  getUrl() {
-    return this.currentUrl;
-  }
-}
-
-const settings = new Settings();
+const getImports = () => import(
+  (chrome.runtime.getURL || chrome.extension.getURL)('/scripts/settings.js')
+);
 
 const getSettings = async (msg) => new Promise((resolve, reject) => {
   chrome.runtime.sendMessage(msg, (response) => {
@@ -63,6 +9,11 @@ const getSettings = async (msg) => new Promise((resolve, reject) => {
     resolve(response.SendingSettings);
   });
 });
+
+const importSettings = async () => {
+  const result = await (await getImports()).loadSettings();
+  return result;
+};
 
 const filter = async () => {
   const arr = document.querySelector('div');
@@ -99,6 +50,7 @@ const createTable = async (isChecked, counter, currrentUrl) => {
 
 const load = async () => {
   const response = await getSettings({ question: 'settings' });
+  const settings = await importSettings();
   settings.addAll(
     response.counter,
     response.currentUrl,
@@ -111,7 +63,6 @@ const load = async () => {
     settings.getUrl(),
   );
 };
-
 const SendStatus = (status) => {
   chrome.runtime.sendMessage({ SendingIsChecked: status });
 };

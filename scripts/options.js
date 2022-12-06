@@ -1,90 +1,21 @@
 /* eslint-disable no-use-before-define */
 /* global chrome */
 
-class Settings {
-  constructor(counter, currentUrl, ischeck) {
-    this.author = [];
-    if (typeof counter === 'undefined') this.counter = 0;
-    else this.counter = counter;
-    if (typeof ischeck === 'undefined') this.ischeck = 'yes';
-    else this.ischeck = ischeck;
+const getImports = () => import(
+  (chrome.runtime.getURL || chrome.extension.getURL)('/scripts/settings.js')
+);
 
-    if (typeof currentUrl === 'undefined') this.currentUrl = '';
-    else this.currentUrl = currentUrl;
-  }
-
-  addAuthor(first, last) {
-    this.author.push({ first_name: first, last_name: last });
-  }
-
-  addAll(counter, currentUrl, ischeck, author) {
-    this.counter = counter;
-    this.currentUrl = currentUrl;
-    this.ischeck = ischeck;
-    this.author = author;
-  }
-
-  addAuthors = (authors) => {
-    this.author = authors;
-  };
-
-  addIschecked(ischeck) {
-    this.ischeck = ischeck;
-  }
-
-  addCounter(counter) {
-    this.counter = counter;
-  }
-
-  AddUrl(currentUrl) {
-    this.currentUrl = currentUrl;
-  }
-
-  getAuthors() {
-    return this.author;
-  }
-
-  getIschecked() {
-    return this.ischeck;
-  }
-
-  getCounter() {
-    return this.counter;
-  }
-
-  getUrl() {
-    return this.currentUrl;
-  }
-}
-
-const settings = new Settings();
-
-document.getElementById('reset').onclick = () => {
-  const authors = [];
-  authors.length = 0;
-  SendAuthors({ SendingAuthors: authors });
-  load();
+const importSettings = async () => {
+  const result = await (await getImports()).loadSettings();
+  return result;
 };
 
-document.body.onload = async () => {
-  filter();
-  load();
-};
-
-const load = async () => {
-  filter();
-  const response = await getSettings({ question: 'settings' });
-  settings.addAll(
-    response.counter,
-    response.currentUrl,
-    response.ischeck,
-    response.author,
-  );
-  console.log(settings.getAuthors());
-  await createTableElements(settings.getAuthors());
-  await show(settings.getAuthors());
-};
-
+const getSettings = async (msg) => new Promise((resolve, reject) => {
+  chrome.runtime.sendMessage(msg, (response) => {
+    if (typeof response.SendingSettings === 'undefined') reject(console.log('Did not received authors!'));
+    resolve(response.SendingSettings);
+  });
+});
 const filter = () => {
   const arr = document.querySelector('div');
   arr.innerHTML = '';
@@ -98,7 +29,22 @@ const SendAuthors = async (msg) => new Promise((resolve, reject) => {
     resolve(response);
   });
 });
+const btnEventListener = (authors) => {
+  document.getElementById('Add').addEventListener('click', async () => {
+    const first = document.getElementById('first_name').value;
+    const last = document.getElementById('last_name').value;
+    try {
+      const name = {};
+      name.first_name = first;
+      name.last_name = last;
 
+      authors.push(name);
+      console.log(authors);
+      await SendAuthors({ SendingAuthors: authors });
+      load();
+    } catch { /* empty */ }
+  });
+};
 const createTableElements = async (authors) => {
   const table = document.createElement('table');
   const tbody = document.createElement('tbody');
@@ -135,25 +81,20 @@ const createTableElements = async (authors) => {
   btnEventListener(authors);
 };
 
-const btnEventListener = (authors) => {
-  document.getElementById('Add').addEventListener('click', async () => {
-    const first = document.getElementById('first_name').value;
-    const last = document.getElementById('last_name').value;
-    try {
-      const name = {};
-      name.first_name = first;
-      name.last_name = last;
-
-      authors.push(name);
-      console.log(authors);
-      await SendAuthors({ SendingAuthors: authors });
-      load();
-    } catch {
-      console.log('Error');
-    }
-  });
+const load = async () => {
+  filter();
+  const response = await getSettings({ question: 'settings' });
+  const settings = await importSettings();
+  settings.addAll(
+    response.counter,
+    response.currentUrl,
+    response.ischeck,
+    response.author,
+  );
+  console.log(settings.getAuthors());
+  await createTableElements(settings.getAuthors());
+  await show(settings.getAuthors());
 };
-
 const show = async (authors) => {
   const tbody = document
     .getElementById('blocklist')
@@ -192,9 +133,14 @@ const show = async (authors) => {
   });
 };
 
-const getSettings = async (msg) => new Promise((resolve, reject) => {
-  chrome.runtime.sendMessage(msg, (response) => {
-    if (typeof response.SendingSettings === 'undefined') reject(console.log('Did not received authors!'));
-    resolve(response.SendingSettings);
-  });
-});
+document.getElementById('reset').onclick = () => {
+  const authors = [];
+  authors.length = 0;
+  SendAuthors({ SendingAuthors: authors });
+  load();
+};
+
+document.body.onload = async () => {
+  filter();
+  load();
+};

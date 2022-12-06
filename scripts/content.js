@@ -1,69 +1,8 @@
 /* global chrome */
-let counters = 0;
+let counter = 0;
 const SendData = async (msg) => chrome.runtime.sendMessage(msg);
 
-class Settings {
-  constructor(counter, currentUrl, ischeck) {
-    this.author = [];
-    if (typeof counter === 'undefined') this.counter = 0;
-    else this.counter = counter;
-    if (typeof ischeck === 'undefined') this.ischeck = 'yes';
-    else this.ischeck = ischeck;
-
-    if (typeof currentUrl === 'undefined') this.currentUrl = '';
-    else this.currentUrl = currentUrl;
-  }
-
-  addAuthor(first, last) {
-    this.author.push({ first_name: first, last_name: last });
-  }
-
-  addAll(counter, currentUrl, ischeck, author) {
-    this.counter = counter;
-    this.currentUrl = currentUrl;
-    this.ischeck = ischeck;
-    this.author = author;
-  }
-
-  addAuthors = (authors) => {
-    this.author = authors;
-  };
-
-  addIschecked(ischeck) {
-    this.ischeck = ischeck;
-  }
-
-  addCounter(counter) {
-    this.counter = counter;
-  }
-
-  AddUrl(currentUrl) {
-    this.currentUrl = currentUrl;
-  }
-
-  getAuthors() {
-    return this.author;
-  }
-
-  getIschecked() {
-    return this.ischeck;
-  }
-
-  getCounter() {
-    return this.counter;
-  }
-
-  getUrl() {
-    return this.currentUrl;
-  }
-
-  setCounter(count) {
-    this.counter = count;
-  }
-}
-
-const settings = new Settings();
-
+const getImports = () => import((chrome.runtime.getURL || chrome.extension.getURL)('/scripts/settings.js'));
 const getSettings = async (msg) => new Promise((resolve, reject) => {
   chrome.runtime.sendMessage(msg, (response) => {
     if (typeof response.SendingSettings === 'undefined') reject(console.log('error'));
@@ -71,14 +10,19 @@ const getSettings = async (msg) => new Promise((resolve, reject) => {
   });
 });
 
-const applyFilter = async () => {
+const importSettings = async () => {
+  const result = await (await getImports()).loadSettings();
+  return result;
+};
+
+const applyFilter = async (settings) => {
   const arr = document.querySelectorAll('[data-index]');
   settings.getAuthors().forEach((author) => {
     Array.from(arr).forEach((el) => {
       if (el.textContent.includes(author.first_name) && el.textContent.includes(author.last_name)) {
         const theEl = el;
         theEl.innerHTML = '';
-        counters += 1;
+        counter += 1;
       }
     });
   });
@@ -89,12 +33,12 @@ const composeObserver = new MutationObserver(() => {
   // eslint-disable-next-line no-use-before-define
   load();
 });
-const filter = async () => new Promise((resolve, reject) => {
+const filter = async (settings) => new Promise((resolve, reject) => {
   if (settings.getIschecked() === 'no') {
-    reject(console.log('error'));
+    reject(/* empty */);
   } else {
     composeObserver.disconnect();
-    applyFilter();
+    applyFilter(settings);
     resolve();
   }
 });
@@ -109,34 +53,32 @@ const addObserverIfDesiredNodeAvailable = () => {
   const config = { subtree: true, childList: true, characterData: true };
   composeObserver.observe(composeBox, config);
 };
-const startFilter = async () => {
+
+const startFilter = async (settings) => {
   try {
-    await filter().then(() => {
-      SendData({ Counter: counters });
+    await filter(settings).then(() => {
+      SendData({ Counter: counter });
       addObserverIfDesiredNodeAvailable();
     });
-  } catch {
-    console.log('Author Filter Turned off. No Filtering taking place!');
-  }
+  } catch { /* empty */ }
 };
+
 const load = async () => {
+  const settings = await importSettings();
   try {
-    console.log(settings.getCounter());
     const response = await getSettings({ question: 'settings' });
     settings.addAll(response.counter, response.currentUrl, response.ischeck, response.author);
-  } catch {
-    console.log('No data available!');
-  }
+  } catch { /* empty */ }
 
-  startFilter();
+  startFilter(settings);
 };
+
+window.addEventListener('click', async () => {
+  counter = 0;
+  composeObserver.disconnect();
+  await load();
+});
 
 document.body.onload = async () => {
   await load();
 };
-
-window.addEventListener('click', async () => {
-  composeObserver.disconnect();
-  counters = 0;
-  await load();
-});
